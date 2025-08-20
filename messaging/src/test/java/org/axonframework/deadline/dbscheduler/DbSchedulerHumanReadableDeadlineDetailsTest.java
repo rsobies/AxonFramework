@@ -110,7 +110,7 @@ class DbSchedulerHumanReadableDeadlineDetailsTest {
     private static DeadlineMessage<?> getMessage() {
         return new GenericDeadlineMessage<>(
                 TEST_DEADLINE_NAME,
-                new GenericMessage<>(new MessageType(TEST_DEADLINE_PAYLOAD.getClass()), TEST_DEADLINE_PAYLOAD),
+                new GenericMessage(new MessageType(TEST_DEADLINE_PAYLOAD.getClass()), TEST_DEADLINE_PAYLOAD),
                 Instant::now
         ).withMetaData(getMetaData());
     }

@@ -45,7 +45,7 @@ public class DomainEventEntry extends AbstractSequencedDomainEventEntry<byte[]> 
      * @param eventMessage The event message to convert to a serialized event entry
      * @param serializer   The serializer to convert the event
      */
-    public DomainEventEntry(DomainEventMessage<?> eventMessage, Serializer serializer) {
+    public DomainEventEntry(DomainEventMessage eventMessage, Serializer serializer) {
         super(eventMessage, serializer, byte[].class);
     }
 

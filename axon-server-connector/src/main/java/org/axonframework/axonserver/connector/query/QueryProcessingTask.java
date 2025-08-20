@@ -139,7 +139,7 @@ class QueryProcessingTask implements Runnable, FlowControl {
     public void run() {
         try {
             logger.debug("Will process query [{}]", queryRequest.getQuery());
-            QueryMessage<Object, Object> queryMessage = serializer.deserializeRequest(queryRequest);
+            QueryMessage queryMessage = serializer.deserializeRequest(queryRequest);
             spanFactory.createQueryProcessingSpan(queryMessage).run(() -> {
                 if (numberOfResults(queryRequest.getProcessingInstructionsList()) == DIRECT_QUERY_NUMBER_OF_RESULTS) {
                     if (supportsStreaming && reactorOnClassPath.get()) {
@@ -195,16 +195,16 @@ class QueryProcessingTask implements Runnable, FlowControl {
         return streamableResultRef.get() == null;
     }
 
-    private <Q, R> void streamingQuery(QueryMessage<Q, R> originalQueryMessage) {
+    private <Q, R> void streamingQuery(QueryMessage originalQueryMessage) {
         // noinspection unchecked
-        StreamingQueryMessage<Q, R> streamingQueryMessage = new GenericStreamingQueryMessage<>(
+        StreamingQueryMessage streamingQueryMessage = new GenericStreamingQueryMessage(
                 originalQueryMessage,
                 (Class<R>) originalQueryMessage.responseType().getExpectedResponseType());
-        Publisher<QueryResponseMessage<R>> resultPublisher = localSegment.streamingQuery(streamingQueryMessage);
+        Publisher<QueryResponseMessage> resultPublisher = localSegment.streamingQuery(streamingQueryMessage);
         setResult(streamableFluxResult(resultPublisher));
     }
 
-    private <Q, R, T> void directQuery(QueryMessage<Q, R> queryMessage) {
+    private <Q, R, T> void directQuery(QueryMessage queryMessage) {
         localSegment.query(queryMessage)
                     .whenComplete((result, e) -> {
                         if (e != null) {
@@ -216,7 +216,7 @@ class QueryProcessingTask implements Runnable, FlowControl {
                                         && queryMessage.responseType() instanceof MultipleInstancesResponseType) {
                                     //noinspection unchecked
                                     streamableResponse = streamableMultiInstanceResult(
-                                            (QueryResponseMessage<List<T>>) result,
+                                            (QueryResponseMessage) result,
                                             (Class<T>) queryMessage.responseType().getExpectedResponseType()
                                     );
                                 } else {
@@ -239,8 +239,8 @@ class QueryProcessingTask implements Runnable, FlowControl {
         }
     }
 
-    private <Q, R> void scatterGather(QueryMessage<Q, R> originalQueryMessage) {
-        Stream<QueryResponseMessage<R>> result = localSegment.scatterGather(
+    private <Q, R> void scatterGather(QueryMessage originalQueryMessage) {
+        Stream<QueryResponseMessage> result = localSegment.scatterGather(
                 originalQueryMessage,
                 ProcessingInstructionHelper.timeout(queryRequest.getProcessingInstructionsList()),
                 TimeUnit.MILLISECONDS
@@ -251,7 +251,7 @@ class QueryProcessingTask implements Runnable, FlowControl {
         responseHandler.complete();
     }
 
-    private <R> StreamableResponse streamableFluxResult(Publisher<QueryResponseMessage<R>> resultPublisher) {
+    private <R> StreamableResponse streamableFluxResult(Publisher<QueryResponseMessage> resultPublisher) {
         return new StreamableFluxResponse(Flux.from(resultPublisher),
                                           responseHandler,
                                           serializer,
@@ -259,7 +259,7 @@ class QueryProcessingTask implements Runnable, FlowControl {
                                           clientId);
     }
 
-    private <R> StreamableMultiInstanceResponse<R> streamableMultiInstanceResult(QueryResponseMessage<List<R>> result,
+    private <R> StreamableMultiInstanceResponse<R> streamableMultiInstanceResult(QueryResponseMessage result,
                                                                                  Class<R> responseType) {
         return new StreamableMultiInstanceResponse<>(result,
                                                      responseType,
@@ -268,7 +268,7 @@ class QueryProcessingTask implements Runnable, FlowControl {
                                                      queryRequest.getMessageIdentifier());
     }
 
-    private StreamableInstanceResponse streamableInstanceResult(QueryResponseMessage<?> result) {
+    private StreamableInstanceResponse streamableInstanceResult(QueryResponseMessage result) {
         return new StreamableInstanceResponse(result, responseHandler, serializer, queryRequest.getMessageIdentifier());
     }
 

@@ -52,7 +52,7 @@ public abstract class EventTestUtils {
      * @param <P>   The generic type of the expected payload of the resulting object.
      * @return A {@link List} of {@link EventMessage EventMessages} with a size equalling the given {@code number}.
      */
-    public static <P> List<EventMessage<P>> createEvents(int number) {
+    public static <P> List<EventMessage> createEvents(int number) {
         return IntStream.range(0, number)
                         .mapToObj(EventTestUtils::<P>createEvent)
                         .toList();
@@ -65,7 +65,7 @@ public abstract class EventTestUtils {
      * @param <P> The generic type of the expected payload of the resulting object.
      * @return An {@link EventMessage} with the given {@code seq} as the {@link EventMessage#payload() payload}.
      */
-    public static <P> EventMessage<P> createEvent(int seq) {
+    public static <P> EventMessage createEvent(int seq) {
         return EventTestUtils.asEventMessage(seq);
     }
 
@@ -82,15 +82,15 @@ public abstract class EventTestUtils {
      * implements {@code EventMessage}.
      */
     @SuppressWarnings("unchecked")
-    public static <P> EventMessage<P> asEventMessage(@Nonnull Object event) {
+    public static <P> EventMessage asEventMessage(@Nonnull Object event) {
         if (event instanceof EventMessage) {
-            return (EventMessage<P>) event;
+            return (EventMessage) event;
         } else if (event instanceof Message) {
-            Message<P> message = (Message<P>) event;
-            return new GenericEventMessage<>(message, GenericEventMessage.clock.instant());
+            Message message = (Message) event;
+            return new GenericEventMessage(message, GenericEventMessage.clock.instant());
         }
-        return new GenericEventMessage<>(
-                new GenericMessage<>(new MessageType(event.getClass()), (P) event),
+        return new GenericEventMessage(
+                new GenericMessage(new MessageType(event.getClass()), (P) event),
                 GenericEventMessage.clock.instant()
         );
     }

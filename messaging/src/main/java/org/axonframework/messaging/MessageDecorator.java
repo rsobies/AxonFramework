@@ -34,9 +34,9 @@ import java.lang.reflect.Type;
  * @author Rene de Waele
  * @since 3.0.0
  */
-public abstract class MessageDecorator<P> implements Message<P> {
+public abstract class MessageDecorator implements Message {
 
-    private final Message<P> delegate;
+    private final Message delegate;
 
     /**
      * Initializes a new decorator with given {@code delegate} {@link Message}.
@@ -46,7 +46,7 @@ public abstract class MessageDecorator<P> implements Message<P> {
      *
      * @param delegate The {@link Message} delegate.
      */
-    protected MessageDecorator(@Nonnull Message<P> delegate) {
+    protected MessageDecorator(@Nonnull Message delegate) {
         this.delegate = delegate;
     }
 
@@ -64,7 +64,7 @@ public abstract class MessageDecorator<P> implements Message<P> {
 
     @Override
     @Nullable
-    public P payload() {
+    public Object payload() {
         return delegate.payload();
     }
 
@@ -76,7 +76,7 @@ public abstract class MessageDecorator<P> implements Message<P> {
 
     @Override
     @Nonnull
-    public Class<P> payloadType() {
+    public Class<?> payloadType() {
         return delegate.payloadType();
     }
 
@@ -99,7 +99,7 @@ public abstract class MessageDecorator<P> implements Message<P> {
 
     @Override
     @Nonnull
-    public <T> Message<T> withConvertedPayload(@Nonnull Type type, @Nonnull Converter converter) {
+    public <T> Message withConvertedPayload(@Nonnull Type type, @Nonnull Converter converter) {
         return delegate.withConvertedPayload(type, converter);
     }
 
@@ -109,7 +109,7 @@ public abstract class MessageDecorator<P> implements Message<P> {
      * @return The wrapped {@link Message} delegated by this decorator.
      */
     @Nonnull
-    protected Message<P> delegate() {
+    protected Message delegate() {
         return delegate;
     }
 

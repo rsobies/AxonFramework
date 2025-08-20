@@ -55,7 +55,7 @@ public interface StatefulCommandHandler extends MessageHandler {
      * @return A {@code MessagesStream} of a {@link CommandResultMessage}.
      */
     @Nonnull
-    MessageStream.Single<CommandResultMessage<?>> handle(@Nonnull CommandMessage<?> command,
+    MessageStream.Single<CommandResultMessage<?>> handle(@Nonnull CommandMessage command,
                                                          @Nonnull StateManager state,
                                                          @Nonnull ProcessingContext context);
 }

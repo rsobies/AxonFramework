@@ -39,13 +39,13 @@ import java.util.function.UnaryOperator;
 public class LegacyMessageSupportingContext implements ProcessingContext {
 
     private static final String UNSUPPORTED_MESSAGE = "Cannot register lifecycle actions in this ProcessingContext";
-    private final Message<?> message;
+    private final Message message;
 
     /**
      * Initialize the {@link ProcessingContext} with the given {@code message} as the only resource.
      * @param message The message to be used as the only resource in this context.
      */
-    public LegacyMessageSupportingContext(@Nonnull Message<?> message) {
+    public LegacyMessageSupportingContext(@Nonnull Message message) {
         this.message = message;
     }
 

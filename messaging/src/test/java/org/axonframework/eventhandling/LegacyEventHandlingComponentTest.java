@@ -38,7 +38,7 @@ class LegacyEventHandlingComponentTest {
     private EventHandlerInvoker mockInvoker;
 
     @Mock
-    private EventMessage<?> mockEvent;
+    private EventMessage mockEvent;
 
     @Mock
     private ProcessingContext mockContext;
@@ -157,7 +157,7 @@ class LegacyEventHandlingComponentTest {
             //given
             SimpleEventHandlerInvoker simpleInvoker = mock(SimpleEventHandlerInvoker.class);
             SequencingPolicy sequencingPolicy = mock(SequencingPolicy.class);
-            EventMessage<?> event = mock(EventMessage.class);
+            EventMessage event = mock(EventMessage.class);
             Object expectedSequenceId = "test-sequence-id";
 
             when(simpleInvoker.getSequencingPolicy()).thenReturn((SequencingPolicy) sequencingPolicy);
@@ -179,7 +179,7 @@ class LegacyEventHandlingComponentTest {
             //given
             SimpleEventHandlerInvoker simpleInvoker = mock(SimpleEventHandlerInvoker.class);
             SequencingPolicy sequencingPolicy = mock(SequencingPolicy.class);
-            EventMessage<?> event = mock(EventMessage.class);
+            EventMessage event = mock(EventMessage.class);
 
             when(simpleInvoker.getSequencingPolicy()).thenReturn((SequencingPolicy) sequencingPolicy);
             when(sequencingPolicy.getSequenceIdentifierFor(event)).thenReturn(Optional.empty());
@@ -201,7 +201,7 @@ class LegacyEventHandlingComponentTest {
             MultiEventHandlerInvoker multiInvoker = mock(MultiEventHandlerInvoker.class);
             SimpleEventHandlerInvoker simpleInvoker = mock(SimpleEventHandlerInvoker.class);
             SequencingPolicy sequencingPolicy = mock(SequencingPolicy.class);
-            EventMessage<?> event = mock(EventMessage.class);
+            EventMessage event = mock(EventMessage.class);
             Object expectedSequenceId = "multi-sequence-id";
 
             when(multiInvoker.delegates()).thenReturn(List.of(simpleInvoker));
@@ -223,7 +223,7 @@ class LegacyEventHandlingComponentTest {
             //given
             MultiEventHandlerInvoker multiInvoker = mock(MultiEventHandlerInvoker.class);
             EventHandlerInvoker otherInvoker = mock(EventHandlerInvoker.class);
-            EventMessage<?> event = mock(EventMessage.class);
+            EventMessage event = mock(EventMessage.class);
 
             when(multiInvoker.delegates()).thenReturn(List.of(otherInvoker));
 
@@ -240,7 +240,7 @@ class LegacyEventHandlingComponentTest {
         void shouldReturnEventIdentifierFromMultiEventHandlerInvokerWithEmptyDelegates() {
             //given
             MultiEventHandlerInvoker multiInvoker = mock(MultiEventHandlerInvoker.class);
-            EventMessage<?> event = mock(EventMessage.class);
+            EventMessage event = mock(EventMessage.class);
 
             when(multiInvoker.delegates()).thenReturn(List.of());
 
@@ -257,7 +257,7 @@ class LegacyEventHandlingComponentTest {
         void shouldReturnEventIdentifierFromUnsupportedEventHandlerInvokerType() {
             //given
             EventHandlerInvoker unsupportedInvoker = mock(EventHandlerInvoker.class);
-            EventMessage<?> event = mock(EventMessage.class);
+            EventMessage event = mock(EventMessage.class);
 
             LegacyEventHandlingComponent component = new LegacyEventHandlingComponent(unsupportedInvoker);
 
@@ -274,7 +274,7 @@ class LegacyEventHandlingComponentTest {
             MultiEventHandlerInvoker multiInvoker = mock(MultiEventHandlerInvoker.class);
             EventHandlerInvoker firstInvoker = mock(EventHandlerInvoker.class);
             EventHandlerInvoker secondInvoker = mock(EventHandlerInvoker.class);
-            EventMessage<?> event = mock(EventMessage.class);
+            EventMessage event = mock(EventMessage.class);
 
             when(multiInvoker.delegates()).thenReturn(List.of(firstInvoker, secondInvoker));
 
@@ -293,7 +293,7 @@ class LegacyEventHandlingComponentTest {
             MultiEventHandlerInvoker multiInvoker = mock(MultiEventHandlerInvoker.class);
             EventHandlerInvoker firstInvoker = mock(EventHandlerInvoker.class);
             SimpleEventHandlerInvoker secondInvoker = mock(SimpleEventHandlerInvoker.class);
-            EventMessage<?> event = mock(EventMessage.class);
+            EventMessage event = mock(EventMessage.class);
 
             when(multiInvoker.delegates()).thenReturn(List.of(firstInvoker, secondInvoker));
 

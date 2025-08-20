@@ -43,7 +43,7 @@ class SequenceOverridingEventHandlingComponentTest {
         SequencingPolicy policy = event -> Optional.of(policySequenceId);
         var delegate = getEventHandlingComponentWithSequenceId(delegateSequenceId);
         var testSubject = new SequenceOverridingEventHandlingComponent(policy, delegate);
-        var testEvent = new GenericEventMessage<>(
+        var testEvent = new GenericEventMessage(
                 new MessageType("TestEvent"), 
                 "test-payload"
         );
@@ -62,7 +62,7 @@ class SequenceOverridingEventHandlingComponentTest {
         SequencingPolicy policy = event -> Optional.empty();
         EventHandlingComponent delegate = getEventHandlingComponentWithSequenceId(delegateSequenceId);
         var testSubject = new SequenceOverridingEventHandlingComponent(policy, delegate);
-        var testEvent = new GenericEventMessage<>(
+        var testEvent = new GenericEventMessage(
                 new MessageType("TestEvent"), 
                 "test-payload"
         );
@@ -79,7 +79,7 @@ class SequenceOverridingEventHandlingComponentTest {
         return new EventHandlingComponent() {
             @Nonnull
             @Override
-            public Object sequenceIdentifierFor(@Nonnull EventMessage<?> event) {
+            public Object sequenceIdentifierFor(@Nonnull EventMessage event) {
                 return delegateSequenceId;
             }
 
@@ -89,7 +89,7 @@ class SequenceOverridingEventHandlingComponentTest {
             }
 
             @Override
-            public MessageStream.Empty<Message<Void>> handle(@Nonnull EventMessage<?> event,
+            public MessageStream.Empty<Message> handle(@Nonnull EventMessage event,
                                                              @Nonnull ProcessingContext context) {
                 return MessageStream.empty();
             }

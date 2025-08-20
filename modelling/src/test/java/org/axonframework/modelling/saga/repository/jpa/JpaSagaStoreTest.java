@@ -51,7 +51,7 @@ class JpaSagaStoreTest {
             Persistence.createEntityManagerFactory("jpaSagaStorePersistenceUnit");
     private final EntityManager entityManager = entityManagerFactory.createEntityManager();
     private final EntityManagerProvider entityManagerProvider = new SimpleEntityManagerProvider(entityManager);
-    private LegacyDefaultUnitOfWork<Message<?>> unitOfWork;
+    private LegacyDefaultUnitOfWork<Message> unitOfWork;
 
     @BeforeEach
     void setUp() {

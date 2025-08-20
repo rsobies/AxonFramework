@@ -162,7 +162,7 @@ public class StubProcessingContext implements ProcessingContext {
      * @param message The message to create a context for.
      * @return A new {@link ProcessingContext} instance containing the given {@code message} as a resource.
      */
-    public static ProcessingContext forMessage(Message<?> message) {
+    public static ProcessingContext forMessage(Message message) {
         return Message.addToContext(new StubProcessingContext(), message);
     }
 

@@ -92,14 +92,14 @@ class SubscribingEventProcessorTest {
     @Test
     void subscribingEventProcessorIsTraced() throws Exception {
         doAnswer(invocation -> {
-            EventMessage<?> message = invocation.getArgument(0, EventMessage.class);
+            EventMessage message = invocation.getArgument(0, EventMessage.class);
             spanFactory.verifySpanActive("EventProcessor.process", message);
             return null;
         }).when(mockHandler).handleSync(any(), any());
 
         testSubject.start();
 
-        List<DomainEventMessage<?>> events = createDomainEvents(2);
+        List<DomainEventMessage> events = createDomainEvents(2);
         eventBus.publish(events);
         events.forEach(e -> spanFactory.verifySpanCompleted("EventProcessor.process", e));
     }

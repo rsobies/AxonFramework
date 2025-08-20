@@ -41,9 +41,9 @@ class EventProcessorOperationsTest {
 
     @Test
     void expectCallbackForAllMessages() throws Exception {
-        List<DomainEventMessage<?>> events = createDomainEvents(2);
-        Set<DomainEventMessage<?>> pending = new HashSet<>(events);
-        MessageMonitor<EventMessage<?>> messageMonitor = (message) -> new MessageMonitor.MonitorCallback() {
+        List<DomainEventMessage> events = createDomainEvents(2);
+        Set<DomainEventMessage> pending = new HashSet<>(events);
+        MessageMonitor<EventMessage> messageMonitor = (message) -> new MessageMonitor.MonitorCallback() {
             @Override
             public void reportSuccess() {
                 if (!pending.contains(message)) {
@@ -77,9 +77,9 @@ class EventProcessorOperationsTest {
 
         // Also test that the mechanism used to call the monitor can deal with the message in the unit of work being
         // modified during processing
-        testSubject.registerHandlerInterceptor(new MessageHandlerInterceptor<EventMessage<?>>() {
+        testSubject.registerHandlerInterceptor(new MessageHandlerInterceptor<EventMessage>() {
             @Override
-            public Object handle(@Nonnull LegacyUnitOfWork<? extends EventMessage<?>> unitOfWork,
+            public Object handle(@Nonnull LegacyUnitOfWork<? extends EventMessage> unitOfWork,
                                  @Nonnull ProcessingContext context,
                                  @Nonnull InterceptorChain interceptorChain) throws Exception {
                 unitOfWork.transformMessage(m -> createDomainEvent());
@@ -87,7 +87,7 @@ class EventProcessorOperationsTest {
             }
 
             @Override
-            public <M extends EventMessage<?>, R extends Message<?>> MessageStream<R> interceptOnHandle(
+            public <M extends EventMessage, R extends Message> MessageStream<R> interceptOnHandle(
                     @Nonnull M message, @Nonnull ProcessingContext context,
                     @Nonnull InterceptorChain<M, R> interceptorChain) {
                 var event = createDomainEvent();
@@ -127,7 +127,7 @@ class EventProcessorOperationsTest {
         }
 
         @Override
-        public List<MessageHandlerInterceptor<? super EventMessage<?>>> getHandlerInterceptors() {
+        public List<MessageHandlerInterceptor<? super EventMessage>> getHandlerInterceptors() {
             return eventProcessorOperations.handlerInterceptors();
         }
 
@@ -149,13 +149,13 @@ class EventProcessorOperationsTest {
             return false;
         }
 
-        void processInBatchingUnitOfWork(List<? extends EventMessage<?>> eventMessages) throws Exception {
+        void processInBatchingUnitOfWork(List<? extends EventMessage> eventMessages) throws Exception {
             eventProcessorOperations.processInUnitOfWork(eventMessages, new UnitOfWork());
         }
 
         @Override
         public Registration registerHandlerInterceptor(
-                @Nonnull MessageHandlerInterceptor<? super EventMessage<?>> handlerInterceptor) {
+                @Nonnull MessageHandlerInterceptor<? super EventMessage> handlerInterceptor) {
             return eventProcessorOperations.registerHandlerInterceptor(handlerInterceptor);
         }
 
@@ -178,7 +178,7 @@ class EventProcessorOperationsTest {
             }
 
             @Override
-            public Builder messageMonitor(@Nonnull MessageMonitor<? super EventMessage<?>> messageMonitor) {
+            public Builder messageMonitor(@Nonnull MessageMonitor<? super EventMessage> messageMonitor) {
                 super.messageMonitor(messageMonitor);
                 return this;
             }

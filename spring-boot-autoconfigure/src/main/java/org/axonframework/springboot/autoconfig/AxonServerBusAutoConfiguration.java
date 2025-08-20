@@ -74,7 +74,7 @@ public class AxonServerBusAutoConfiguration {
                                                               @Qualifier("localSegment") CommandBus localSegment,
                                                               @Qualifier("messageSerializer") Serializer messageSerializer,
                                                               RoutingStrategy routingStrategy,
-                                                              TargetContextResolver<? super CommandMessage<?>> targetContextResolver,
+                                                              TargetContextResolver<? super CommandMessage> targetContextResolver,
                                                               CommandBusSpanFactory spanFactory) {
         // TODO #3076 - Wire the AxonServerConnector instead of the AxonServerCommandBus
         return (AxonServerCommandBusConnector) null;
@@ -90,7 +90,7 @@ public class AxonServerBusAutoConfiguration {
                                        Serializer genericSerializer,
                                        QueryPriorityCalculator priorityCalculator,
                                        QueryInvocationErrorHandler queryInvocationErrorHandler,
-                                       TargetContextResolver<? super QueryMessage<?, ?>> targetContextResolver) {
+                                       TargetContextResolver<? super QueryMessage> targetContextResolver) {
         SimpleQueryBus simpleQueryBus =
                 SimpleQueryBus.builder()
                               .messageMonitor(axonConfiguration.messageMonitor(QueryBus.class, "queryBus"))

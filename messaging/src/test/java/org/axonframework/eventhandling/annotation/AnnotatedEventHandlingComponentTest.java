@@ -103,11 +103,11 @@ class AnnotatedEventHandlingComponentTest {
         @Test
         void handlesSequenceOfEvents() {
             // when
-            DomainEventMessage<?> event0 = domainEvent(0);
+            DomainEventMessage event0 = domainEvent(0);
             var result1 = eventHandlingComponent.handle(event0, StubProcessingContext.forMessage(event0));
-            DomainEventMessage<?> event1 = domainEvent(1);
+            DomainEventMessage event1 = domainEvent(1);
             var result2 = eventHandlingComponent.handle(event1, StubProcessingContext.forMessage(event1));
-            DomainEventMessage<?> event2 = domainEvent(2);
+            DomainEventMessage event2 = domainEvent(2);
             var result3 = eventHandlingComponent.handle(event2, StubProcessingContext.forMessage(event2));
 
             // then
@@ -183,7 +183,7 @@ class AnnotatedEventHandlingComponentTest {
         }
     }
 
-    private static void assertSuccessfulStream(MessageStream.Empty<Message<Void>> result) {
+    private static void assertSuccessfulStream(MessageStream.Empty<Message> result) {
         assertTrue(result.error().isEmpty());
     }
 
@@ -277,12 +277,12 @@ class AnnotatedEventHandlingComponentTest {
         }
     }
 
-    private static DomainEventMessage<?> domainEvent(int seq) {
+    private static DomainEventMessage domainEvent(int seq) {
         return domainEvent(seq, null);
     }
 
-    private static DomainEventMessage<?> domainEvent(int seq, String sampleMetaData) {
-        return new GenericDomainEventMessage<>(
+    private static DomainEventMessage domainEvent(int seq, String sampleMetaData) {
+        return new GenericDomainEventMessage(
                 "test",
                 "id",
                 seq,

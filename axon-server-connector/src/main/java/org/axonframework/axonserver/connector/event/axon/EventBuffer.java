@@ -62,11 +62,11 @@ public class EventBuffer implements TrackingEventStream {
     private static final int MAX_AWAIT_AVAILABLE_DATA = 500;
 
     private final EventStream delegate;
-    private final Iterator<TrackedEventMessage<?>> eventStream;
+    private final Iterator<TrackedEventMessage> eventStream;
     private final Serializer serializer;
     private final boolean disableIgnoredEventFiltering;
 
-    private TrackedEventMessage<?> peekEvent;
+    private TrackedEventMessage peekEvent;
 
     private final ReentrantLock lock = new ReentrantLock();
     private final Condition dataAvailable = lock.newCondition();
@@ -118,7 +118,7 @@ public class EventBuffer implements TrackingEventStream {
      * This implementation removes events from the stream based on the payload type of the given message.
      */
     @Override
-    public void skipMessagesWithPayloadTypeOf(TrackedEventMessage<?> ignoredMessage) {
+    public void skipMessagesWithPayloadTypeOf(TrackedEventMessage ignoredMessage) {
         if (!disableIgnoredEventFiltering) {
             SerializedType serializedType;
             if (UnknownSerializedType.class.equals(ignoredMessage.payloadType())) {
@@ -132,7 +132,7 @@ public class EventBuffer implements TrackingEventStream {
     }
 
     @Override
-    public Optional<TrackedEventMessage<?>> peek() {
+    public Optional<TrackedEventMessage> peek() {
         return Optional.ofNullable(peekNullable());
     }
 
@@ -166,7 +166,7 @@ public class EventBuffer implements TrackingEventStream {
         }
     }
 
-    private TrackedEventMessage<?> peekNullable() {
+    private TrackedEventMessage peekNullable() {
         if (peekEvent == null && eventStream.hasNext()) {
             peekEvent = eventStream.next();
         }
@@ -180,7 +180,7 @@ public class EventBuffer implements TrackingEventStream {
     }
 
     @Override
-    public TrackedEventMessage<?> nextAvailable() {
+    public TrackedEventMessage nextAvailable() {
         try {
             hasNextAvailable(Integer.MAX_VALUE, TimeUnit.MILLISECONDS);
             return peekEvent == null ? eventStream.next() : peekEvent;

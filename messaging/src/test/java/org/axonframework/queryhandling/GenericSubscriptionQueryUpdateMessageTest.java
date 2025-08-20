@@ -34,7 +34,7 @@ class GenericSubscriptionQueryUpdateMessageTest extends MessageTestSuite<Subscri
 
     @Override
     protected SubscriptionQueryUpdateMessage<?> buildDefaultMessage() {
-        return new GenericSubscriptionQueryUpdateMessage<>(new GenericMessage<>(
+        return new GenericSubscriptionQueryUpdateMessage<>(new GenericMessage(
                 TEST_IDENTIFIER, TEST_TYPE, TEST_PAYLOAD, TEST_PAYLOAD_TYPE, TEST_META_DATA
         ));
     }

@@ -120,12 +120,12 @@ public class StubDeadlineManager implements DeadlineManager {
                                                             @Nonnull Instant expiryTime) {
         if (messageOrPayload instanceof Message) {
             return new GenericDeadlineMessage<>(
-                    deadlineName, (Message<P>) messageOrPayload, () -> expiryTime
+                    deadlineName, (Message) messageOrPayload, () -> expiryTime
             );
         }
         MessageType type = new MessageType(ObjectUtils.nullSafeTypeOf(messageOrPayload));
         return new GenericDeadlineMessage<>(
-                deadlineName, new GenericMessage<>(type, (P) messageOrPayload), () -> expiryTime
+                deadlineName, new GenericMessage(type, (P) messageOrPayload), () -> expiryTime
         );
     }
 
@@ -267,7 +267,7 @@ public class StubDeadlineManager implements DeadlineManager {
             deadlineConsumer.consume(scheduledDeadlineInfo.getDeadlineScope(), deadlineMessage);
             return deadlineMessage;
         });
-        ResultMessage<?> resultMessage = uow.executeWithResult(chain::proceedSync);
+        ResultMessage resultMessage = uow.executeWithResult(chain::proceedSync);
         if (resultMessage.isExceptional()) {
             Throwable e = resultMessage.exceptionResult();
             throw new FixtureExecutionException("Exception occurred while handling the deadline", e);

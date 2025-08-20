@@ -72,7 +72,7 @@ public interface FixtureExecutionResult {
      * @param matcher  A matcher defining the event expected to be published
      * @return the FixtureExecutionResult for method chaining
      */
-    FixtureExecutionResult expectScheduledEventMatching(Duration duration, Matcher<? super EventMessage<?>> matcher);
+    FixtureExecutionResult expectScheduledEventMatching(Duration duration, Matcher<? super EventMessage> matcher);
 
     /**
      * Asserts that a deadline scheduled after given {@code duration} matches the given {@code matcher}.
@@ -149,7 +149,7 @@ public interface FixtureExecutionResult {
      * @return the FixtureExecutionResult for method chaining
      */
     FixtureExecutionResult expectScheduledEventMatching(Instant scheduledTime,
-                                                        Matcher<? super EventMessage<?>> matcher);
+                                                        Matcher<? super EventMessage> matcher);
 
     /**
      * Asserts that a deadline matching the given {@code matcher} has been scheduled at the given {@code
@@ -248,7 +248,7 @@ public interface FixtureExecutionResult {
      * @param matcher The matcher that describes the expected list of commands
      * @return the FixtureExecutionResult for method chaining
      */
-    FixtureExecutionResult expectDispatchedCommandsMatching(Matcher<? extends List<? super CommandMessage<?>>> matcher);
+    FixtureExecutionResult expectDispatchedCommandsMatching(Matcher<? extends List<? super CommandMessage>> matcher);
 
     /**
      * Asserts that the sagas did not dispatch any commands. Only commands as a result of the event in the "when" stage
@@ -276,7 +276,7 @@ public interface FixtureExecutionResult {
      * @return the FixtureExecutionResult for method chaining
      */
     FixtureExecutionResult expectNoScheduledEventMatching(Duration durationToScheduledTime,
-                                                          Matcher<? super EventMessage<?>> matcher);
+                                                          Matcher<? super EventMessage> matcher);
 
     /**
      * Asserts that <b>no</b> event equal to the given {@code event} has been scheduled after the given {@code
@@ -315,7 +315,7 @@ public interface FixtureExecutionResult {
      * @return the FixtureExecutionResult for method chaining
      */
     FixtureExecutionResult expectNoScheduledEventMatching(Instant scheduledTime,
-                                                          Matcher<? super EventMessage<?>> matcher);
+                                                          Matcher<? super EventMessage> matcher);
 
     /**
      * Asserts that <b>no</b> event equal to the given {@code event} has been scheduled at the given {@code
@@ -517,7 +517,7 @@ public interface FixtureExecutionResult {
      * @param matcher The matcher that defines the expected list of published events.
      * @return the FixtureExecutionResult for method chaining
      */
-    FixtureExecutionResult expectPublishedEventsMatching(Matcher<? extends List<? super EventMessage<?>>> matcher);
+    FixtureExecutionResult expectPublishedEventsMatching(Matcher<? extends List<? super EventMessage>> matcher);
 
     /**
      * Asserts that deadlines matching the given {@code matcher} have been triggered for this aggregate.

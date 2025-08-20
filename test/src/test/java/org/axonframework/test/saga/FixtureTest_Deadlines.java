@@ -328,7 +328,7 @@ class FixtureTest_Deadlines {
                                                             Instant expiryTime) {
         var type = new MessageType(payload.getClass());
         return new GenericDeadlineMessage<>(
-                deadlineName, new GenericMessage<>(type, (P) payload), () -> expiryTime
+                deadlineName, new GenericMessage(type, (P) payload), () -> expiryTime
         );
     }
 

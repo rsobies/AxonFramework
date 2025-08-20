@@ -37,7 +37,7 @@ public interface EventBusSpanFactory {
      * @param eventMessage The event message to create a span for.
      * @return The created span.
      */
-    Span createPublishEventSpan(EventMessage<?> eventMessage);
+    Span createPublishEventSpan(EventMessage eventMessage);
 
     /**
      * Creates a span for the committing of events. This is usually batched and done in the commit phase of a UnitOfWork.
@@ -53,5 +53,5 @@ public interface EventBusSpanFactory {
      * @param <T>          The type of the payload of the event message.
      * @return The event message with the propagated context.
      */
-    <T> EventMessage<T> propagateContext(EventMessage<T> eventMessage);
+    <T> EventMessage propagateContext(EventMessage eventMessage);
 }

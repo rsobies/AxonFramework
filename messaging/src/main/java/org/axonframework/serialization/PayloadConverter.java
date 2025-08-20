@@ -38,7 +38,7 @@ public interface PayloadConverter {
      * @param <R>               The type of message to convert into
      * @return the converted message
      */
-    <T extends Message<?>, R extends Message<?>> R convertPayload(T message, Type targetPayloadType);
+    <T extends Message, R extends Message> R convertPayload(T message, Type targetPayloadType);
 
     /**
      * Convert the payload of given {@code message} to given {@code targetPayloadType}.
@@ -53,7 +53,7 @@ public interface PayloadConverter {
      * @param <R>               The type of message to convert into
      * @return the converted message
      */
-    default <P, T extends Message<?>, R extends Message<P>> R convertPayload(T message, Class<P> targetPayloadType) {
+    default <P, T extends Message, R extends Message> R convertPayload(T message, Class<P> targetPayloadType) {
         return convertPayload(message, (Type) targetPayloadType);
     }
 }

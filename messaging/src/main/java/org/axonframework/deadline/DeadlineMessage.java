@@ -37,7 +37,7 @@ import java.util.Map;
  * @author Steven van Beelen
  * @since 3.3.0
  */
-public interface DeadlineMessage<P> extends EventMessage<P> {
+public interface DeadlineMessage<P> extends EventMessage {
 
     /**
      * Returns the name of the {@link DeadlineMessage deadline} to be handled.
@@ -57,13 +57,13 @@ public interface DeadlineMessage<P> extends EventMessage<P> {
 
     @Override
     @Nonnull
-    default <T> DeadlineMessage<T> withConvertedPayload(@Nonnull Class<T> type, @Nonnull Converter converter) {
+    default DeadlineMessage<?> withConvertedPayload(@Nonnull Class<?> type, @Nonnull Converter converter) {
         return withConvertedPayload((Type) type, converter);
     }
 
     @Override
     @Nonnull
-    default <T> DeadlineMessage<T> withConvertedPayload(@Nonnull TypeReference<T> type, @Nonnull Converter converter) {
+    default DeadlineMessage<?> withConvertedPayload(@Nonnull TypeReference<?> type, @Nonnull Converter converter) {
         return withConvertedPayload(type.getType(), converter);
     }
 

@@ -124,9 +124,9 @@ public abstract class AbstractSubscriptionQueryTestSuite {
         );
 
         // when
-        SubscriptionQueryResult<QueryResponseMessage<List<String>>, SubscriptionQueryUpdateMessage<String>> result1 =
+        SubscriptionQueryResult<QueryResponseMessage>, SubscriptionQueryUpdateMessage<String>> result1 =
                 queryBus.subscriptionQuery(queryMessage1);
-        SubscriptionQueryResult<QueryResponseMessage<Integer>, SubscriptionQueryUpdateMessage<Integer>> result2 =
+        SubscriptionQueryResult<QueryResponseMessage, SubscriptionQueryUpdateMessage<Integer>> result2 =
                 queryBus.subscriptionQuery(queryMessage2);
 
         // then
@@ -171,7 +171,7 @@ public abstract class AbstractSubscriptionQueryTestSuite {
         );
 
         // when
-        SubscriptionQueryResult<QueryResponseMessage<List<String>>, SubscriptionQueryUpdateMessage<String>> result =
+        SubscriptionQueryResult<QueryResponseMessage>, SubscriptionQueryUpdateMessage<String>> result =
                 queryBus.subscriptionQuery(queryMessage);
 
         // then
@@ -205,7 +205,7 @@ public abstract class AbstractSubscriptionQueryTestSuite {
                 new MessageType(testQueryName), testQueryPayload,
                 multipleInstancesOf(String.class), instanceOf(String.class)
         );
-        SubscriptionQueryResult<QueryResponseMessage<List<String>>, SubscriptionQueryUpdateMessage<String>> result =
+        SubscriptionQueryResult<QueryResponseMessage>, SubscriptionQueryUpdateMessage<String>> result =
                 queryBus.subscriptionQuery(queryMessage);
 
         chatQueryHandler.emitter.emit(String.class, testQueryPayload::equals, testUpdate);
@@ -232,7 +232,7 @@ public abstract class AbstractSubscriptionQueryTestSuite {
         RuntimeException toBeThrown = new RuntimeException();
 
         // when
-        SubscriptionQueryResult<QueryResponseMessage<List<String>>, SubscriptionQueryUpdateMessage<String>> result =
+        SubscriptionQueryResult<QueryResponseMessage>, SubscriptionQueryUpdateMessage<String>> result =
                 queryBus.subscriptionQuery(queryMessage,
                                            Queues.SMALL_BUFFER_SIZE);
         Executors.newSingleThreadScheduledExecutor().schedule(() -> {
@@ -264,9 +264,9 @@ public abstract class AbstractSubscriptionQueryTestSuite {
         );
 
         // when
-        SubscriptionQueryResult<QueryResponseMessage<List<String>>, SubscriptionQueryUpdateMessage<String>> result1 =
+        SubscriptionQueryResult<QueryResponseMessage>, SubscriptionQueryUpdateMessage<String>> result1 =
                 queryBus.subscriptionQuery(queryMessage1);
-        SubscriptionQueryResult<QueryResponseMessage<List<String>>, SubscriptionQueryUpdateMessage<String>> result2 =
+        SubscriptionQueryResult<QueryResponseMessage>, SubscriptionQueryUpdateMessage<String>> result2 =
                 queryBus.subscriptionQuery(queryMessage2);
 
         List<String> query1Updates = new ArrayList<>();
@@ -302,7 +302,7 @@ public abstract class AbstractSubscriptionQueryTestSuite {
                 new MessageType(testQueryName) , testQueryPayload,
                 multipleInstancesOf(String.class), instanceOf(String.class)
         );
-        SubscriptionQueryResult<QueryResponseMessage<List<String>>, SubscriptionQueryUpdateMessage<String>> result =
+        SubscriptionQueryResult<QueryResponseMessage>, SubscriptionQueryUpdateMessage<String>> result =
                 queryBus.subscriptionQuery(queryMessage);
 
         chatQueryHandler.emitter.emit(String.class, testQueryPayload::equals, testUpdate);
@@ -331,7 +331,7 @@ public abstract class AbstractSubscriptionQueryTestSuite {
         );
 
         // when
-        SubscriptionQueryResult<QueryResponseMessage<List<String>>, SubscriptionQueryUpdateMessage<String>> result =
+        SubscriptionQueryResult<QueryResponseMessage>, SubscriptionQueryUpdateMessage<String>> result =
                 queryBus.subscriptionQuery(queryMessage);
         Executors.newSingleThreadScheduledExecutor().schedule(() -> {
             chatQueryHandler.emitter.emit(String.class, TEST_PAYLOAD::equals, "Update1");
@@ -363,7 +363,7 @@ public abstract class AbstractSubscriptionQueryTestSuite {
                 new MessageType("chatMessages"), testQueryPayload,
                 multipleInstancesOf(String.class), instanceOf(String.class)
         );
-        SubscriptionQueryResult<QueryResponseMessage<List<String>>, SubscriptionQueryUpdateMessage<String>> result =
+        SubscriptionQueryResult<QueryResponseMessage>, SubscriptionQueryUpdateMessage<String>> result =
                 queryBus.subscriptionQuery(queryMessage);
 
         chatQueryHandler.emitter.emit(String.class, testQueryPayload::equals, testUpdate);
@@ -391,7 +391,7 @@ public abstract class AbstractSubscriptionQueryTestSuite {
         );
 
         // when
-        SubscriptionQueryResult<QueryResponseMessage<String>, SubscriptionQueryUpdateMessage<String>> result = queryBus
+        SubscriptionQueryResult<QueryResponseMessage, SubscriptionQueryUpdateMessage<String>> result = queryBus
                 .subscriptionQuery(queryMessage);
 
         // then
@@ -414,7 +414,7 @@ public abstract class AbstractSubscriptionQueryTestSuite {
         );
 
         // when
-        SubscriptionQueryResult<QueryResponseMessage<String>, SubscriptionQueryUpdateMessage<String>> result =
+        SubscriptionQueryResult<QueryResponseMessage, SubscriptionQueryUpdateMessage<String>> result =
                 queryBus.subscriptionQuery(queryMessage);
 
         // then
@@ -436,7 +436,7 @@ public abstract class AbstractSubscriptionQueryTestSuite {
         );
 
         // when
-        SubscriptionQueryResult<QueryResponseMessage<List<String>>, SubscriptionQueryUpdateMessage<String>> result =
+        SubscriptionQueryResult<QueryResponseMessage>, SubscriptionQueryUpdateMessage<String>> result =
                 queryBus.subscriptionQuery(queryMessage,
                                            8);
         List<String> initial1 = new ArrayList<>();
@@ -514,7 +514,7 @@ public abstract class AbstractSubscriptionQueryTestSuite {
                 multipleInstancesOf(String.class), instanceOf(String.class)
         );
 
-        SubscriptionQueryResult<QueryResponseMessage<List<String>>, SubscriptionQueryUpdateMessage<String>> result =
+        SubscriptionQueryResult<QueryResponseMessage>, SubscriptionQueryUpdateMessage<String>> result =
                 queryBus.subscriptionQuery(queryMessage, 100);
 
         for (int i = 0; i <= 200; i++) {
@@ -548,7 +548,7 @@ public abstract class AbstractSubscriptionQueryTestSuite {
                 multipleInstancesOf(String.class), instanceOf(String.class)
         );
 
-        SubscriptionQueryResult<QueryResponseMessage<List<String>>, SubscriptionQueryUpdateMessage<String>> result =
+        SubscriptionQueryResult<QueryResponseMessage>, SubscriptionQueryUpdateMessage<String>> result =
                 queryBus.subscriptionQuery(queryMessage, 100);
 
         Flux<SubscriptionQueryUpdateMessage<String>> test1 = result.updates().onBackpressureBuffer(100);
@@ -575,7 +575,7 @@ public abstract class AbstractSubscriptionQueryTestSuite {
                 multipleInstancesOf(String.class), instanceOf(String.class)
         );
 
-        SubscriptionQueryResult<QueryResponseMessage<List<String>>, SubscriptionQueryUpdateMessage<String>> result =
+        SubscriptionQueryResult<QueryResponseMessage>, SubscriptionQueryUpdateMessage<String>> result =
                 queryBus.subscriptionQuery(queryMessage);
 
         chatQueryHandler.emitter.emit(String.class, TEST_PAYLOAD::equals, "Update1");
@@ -606,7 +606,7 @@ public abstract class AbstractSubscriptionQueryTestSuite {
         );
 
         // when
-        SubscriptionQueryResult<QueryResponseMessage<List<String>>, SubscriptionQueryUpdateMessage<String>> result =
+        SubscriptionQueryResult<QueryResponseMessage>, SubscriptionQueryUpdateMessage<String>> result =
                 queryBus.subscriptionQuery(queryMessage);
 
         // then
@@ -628,7 +628,7 @@ public abstract class AbstractSubscriptionQueryTestSuite {
         );
 
         // when
-        SubscriptionQueryResult<QueryResponseMessage<List<String>>, SubscriptionQueryUpdateMessage<String>> result =
+        SubscriptionQueryResult<QueryResponseMessage>, SubscriptionQueryUpdateMessage<String>> result =
                 queryBus.subscriptionQuery(queryMessage);
 
         chatQueryHandler.emitter.emit(String.class, TEST_PAYLOAD::equals, "Update1");
@@ -675,11 +675,11 @@ public abstract class AbstractSubscriptionQueryTestSuite {
         List<String> updates = new ArrayList<>();
         CountDownLatch latch = new CountDownLatch(3);
         queryBus.subscriptionQuery(queryMessage).handle(initial -> {
-                                                            initialResult.add(initial.payload());
+                                                            initialResult.add((String) initial.payload());
                                                             latch.countDown();
                                                         },
                                                         update -> {
-                                                            updates.add(update.payload());
+                                                            updates.add((String) update.payload());
                                                             latch.countDown();
                                                         });
 
@@ -703,12 +703,12 @@ public abstract class AbstractSubscriptionQueryTestSuite {
         List<String> updates = new ArrayList<>();
         CountDownLatch latch = new CountDownLatch(3);
         queryBus.subscriptionQuery(queryMessage).handle(initial -> {
-                                                            initialResult.add(initial.payload());
+                                                            initialResult.add((String) initial.payload());
                                                             latch.countDown();
                                                             throw new IllegalStateException("oops");
                                                         },
                                                         update -> {
-                                                            updates.add(update.payload());
+                                                            updates.add((String) update.payload());
                                                             latch.countDown();
                                                         });
 
@@ -730,9 +730,9 @@ public abstract class AbstractSubscriptionQueryTestSuite {
         List<String> initialResult = new ArrayList<>();
         List<String> updates = new ArrayList<>();
         queryBus.subscriptionQuery(queryMessage, 1)
-                .handle(initial -> initialResult.addAll(initial.payload()),
+                .handle(initial -> initialResult.addAll((List<String>) initial.payload()),
                         update -> {
-                            updates.add(update.payload());
+                            updates.add((String) update.payload());
                             throw new IllegalStateException("oops");
                         });
         chatQueryHandler.emitter.emit(String.class, TEST_PAYLOAD::equals, "Update1");
@@ -760,10 +760,10 @@ public abstract class AbstractSubscriptionQueryTestSuite {
                 .handle(initial -> {
                             // make sure the update is emitted before subscribing to updates
                             chatQueryHandler.emitter.emit(String.class, TEST_PAYLOAD::equals, "Update1");
-                            initialResult.addAll(initial.payload());
+                            initialResult.addAll((List<String>) initial.payload());
                         },
                         update -> {
-                            updates.add(update.payload());
+                            updates.add((String) update.payload());
                             throw new IllegalStateException("oops");
                         });
         chatQueryHandler.emitter.emit(String.class, TEST_PAYLOAD::equals, "Update2");
@@ -786,8 +786,8 @@ public abstract class AbstractSubscriptionQueryTestSuite {
         // when
         List<String> initialResult = new ArrayList<>();
         List<String> updates = new ArrayList<>();
-        queryBus.subscriptionQuery(queryMessage).handle(initial -> initialResult.add(initial.payload()),
-                                                        update -> updates.add(update.payload()));
+        queryBus.subscriptionQuery(queryMessage).handle(initial -> initialResult.add((String) initial.payload()),
+                                                        update -> updates.add((String) update.payload()));
         chatQueryHandler.emitter.emit(String.class, TEST_PAYLOAD::equals, "Update1");
         chatQueryHandler.emitter.emit(String.class, TEST_PAYLOAD::equals, "Update2");
         chatQueryHandler.emitter.complete(String.class, TEST_PAYLOAD::equals);
@@ -809,7 +809,7 @@ public abstract class AbstractSubscriptionQueryTestSuite {
         List<String> initialResult = new ArrayList<>();
         List<String> updates = new ArrayList<>();
         queryBus.subscriptionQuery(queryMessage)
-                .handle(initial -> initialResult.add(initial.payload()), update -> updates.add(update.payload()));
+                .handle(initial -> initialResult.add((String) initial.payload()), update -> updates.add((String) update.payload()));
         chatQueryHandler.emitter.completeExceptionally(String.class, TEST_PAYLOAD::equals, new RuntimeException());
         chatQueryHandler.emitter.emit(String.class, TEST_PAYLOAD::equals, "Update1");
 

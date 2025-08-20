@@ -99,7 +99,7 @@ public class PooledStreamingEventProcessor implements StreamingEventProcessor {
 
     private final EventProcessorOperations eventProcessorOperations;
     private final String name;
-    private final StreamableEventSource<? extends EventMessage<?>> eventSource;
+    private final StreamableEventSource<? extends EventMessage> eventSource;
     private final TokenStore tokenStore;
     private final UnitOfWorkFactory unitOfWorkFactory;
     private final ScheduledExecutorService workerExecutor;
@@ -221,7 +221,7 @@ public class PooledStreamingEventProcessor implements StreamingEventProcessor {
     }
 
     @Override
-    public List<MessageHandlerInterceptor<? super EventMessage<?>>> getHandlerInterceptors() {
+    public List<MessageHandlerInterceptor<? super EventMessage>> getHandlerInterceptors() {
         return eventProcessorOperations.handlerInterceptors();
     }
 
@@ -446,7 +446,7 @@ public class PooledStreamingEventProcessor implements StreamingEventProcessor {
 
     @Override
     public Registration registerHandlerInterceptor(
-            @Nonnull MessageHandlerInterceptor<? super EventMessage<?>> handlerInterceptor) {
+            @Nonnull MessageHandlerInterceptor<? super EventMessage> handlerInterceptor) {
         return eventProcessorOperations.registerHandlerInterceptor(handlerInterceptor);
     }
 
@@ -481,7 +481,7 @@ public class PooledStreamingEventProcessor implements StreamingEventProcessor {
      */
     public static class Builder extends EventProcessorBuilder {
 
-        private StreamableEventSource<? extends EventMessage<?>> eventSource;
+        private StreamableEventSource<? extends EventMessage> eventSource;
         private TokenStore tokenStore;
         private TransactionManager transactionManager;
         private Function<String, ScheduledExecutorService> coordinatorExecutorBuilder;
@@ -526,7 +526,7 @@ public class PooledStreamingEventProcessor implements StreamingEventProcessor {
         }
 
         @Override
-        public Builder messageMonitor(@Nonnull MessageMonitor<? super EventMessage<?>> messageMonitor) {
+        public Builder messageMonitor(@Nonnull MessageMonitor<? super EventMessage> messageMonitor) {
             super.messageMonitor(messageMonitor);
             return this;
         }
@@ -545,7 +545,7 @@ public class PooledStreamingEventProcessor implements StreamingEventProcessor {
          *                    {@link EventProcessor} will track.
          * @return The current Builder instance, for fluent interfacing.
          */
-        public Builder eventSource(@Nonnull StreamableEventSource<? extends EventMessage<?>> eventSource) {
+        public Builder eventSource(@Nonnull StreamableEventSource<? extends EventMessage> eventSource) {
             assertNonNull(eventSource, "StreamableEventSource may not be null");
             this.eventSource = eventSource;
             return this;

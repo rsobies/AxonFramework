@@ -51,10 +51,10 @@ import java.util.Map;
  * @author Steven van Beelen
  * @since 2.0.0
  */
-public class GenericMessage<P> extends AbstractMessage<P> {
+public class GenericMessage extends AbstractMessage {
 
-    private final P payload;
-    private final Class<P> payloadType;
+    private final Object payload;
+    private final Class<?> payloadType;
     private final MetaData metaData;
 
     private transient volatile SerializedObjectHolder serializedObjectHolder;
@@ -69,7 +69,7 @@ public class GenericMessage<P> extends AbstractMessage<P> {
      * @param payload The payload of type {@code P} for this {@link Message}.
      */
     public GenericMessage(@Nonnull MessageType type,
-                          @Nullable P payload) {
+                          @Nullable Object payload) {
         this(type, payload, MetaData.emptyInstance());
     }
 
@@ -84,7 +84,7 @@ public class GenericMessage<P> extends AbstractMessage<P> {
      * @param metaData The metadata for this {@link Message}.
      */
     public GenericMessage(@Nonnull MessageType type,
-                          @Nullable P payload,
+                          @Nullable Object payload,
                           @Nonnull Map<String, String> metaData) {
         this(type, payload, getDeclaredPayloadType(payload), metaData);
     }
@@ -101,7 +101,7 @@ public class GenericMessage<P> extends AbstractMessage<P> {
      * @param declaredPayloadType The declared type of the {@code payload} of this {@link Message}.
      * @param metaData            The metadata for this {@link Message}.
      */
-    public GenericMessage(@Nonnull MessageType type,
+    public <P> GenericMessage(@Nonnull MessageType type,
                           @Nullable P payload,
                           @Nonnull Class<P> declaredPayloadType,
                           @Nonnull Map<String, ?> metaData) {
@@ -127,7 +127,7 @@ public class GenericMessage<P> extends AbstractMessage<P> {
      */
     public GenericMessage(@Nonnull String identifier,
                           @Nonnull MessageType type,
-                          @Nullable P payload,
+                          @Nullable Object payload,
                           @Nonnull Map<String, String> metaData) {
         this(identifier, type, payload, getDeclaredPayloadType(payload), metaData);
     }
@@ -146,7 +146,7 @@ public class GenericMessage<P> extends AbstractMessage<P> {
      * @param declaredPayloadType The declared type of the {@code payload} of this {@link Message}.
      * @param metaData            The metadata for this {@link Message}.
      */
-    public GenericMessage(@Nonnull String identifier,
+    public <P> GenericMessage(@Nonnull String identifier,
                           @Nonnull MessageType type,
                           @Nullable P payload,
                           @Nonnull Class<P> declaredPayloadType,
@@ -158,7 +158,7 @@ public class GenericMessage<P> extends AbstractMessage<P> {
         this.convertedPayloads = new ConversionCache(payload);
     }
 
-    private GenericMessage(@Nonnull GenericMessage<P> original,
+    private GenericMessage(@Nonnull GenericMessage original,
                            @Nonnull MetaData metaData) {
         super(original.identifier(), original.type());
         this.payload = original.payload();
@@ -184,13 +184,13 @@ public class GenericMessage<P> extends AbstractMessage<P> {
      * @return A message with {@code null} {@link Message#payload()}, no {@link MetaData}, and a {@link Message#type()}
      * of {@code "empty"}.
      */
-    public static Message<Void> emptyMessage() {
-        return new GenericMessage<>(new MessageType("empty"), null);
+    public static Message emptyMessage() {
+        return new GenericMessage(new MessageType("empty"), null);
     }
 
     @Override
     @Nullable
-    public P payload() {
+    public Object payload() {
         return this.payload;
     }
 
@@ -211,7 +211,7 @@ public class GenericMessage<P> extends AbstractMessage<P> {
 
     @Override
     @Nonnull
-    public Class<P> payloadType() {
+    public Class<?> payloadType() {
         return this.payloadType;
     }
 
@@ -223,8 +223,8 @@ public class GenericMessage<P> extends AbstractMessage<P> {
 
     @Override
     @Nonnull
-    protected Message<P> withMetaData(MetaData metaData) {
-        return new GenericMessage<>(this, metaData);
+    protected Message withMetaData(MetaData metaData) {
+        return new GenericMessage(this, metaData);
     }
 
     @Override
@@ -246,12 +246,12 @@ public class GenericMessage<P> extends AbstractMessage<P> {
 
     @Override
     @Nonnull
-    public <T> Message<T> withConvertedPayload(@Nonnull Type type,
+    public <T> Message withConvertedPayload(@Nonnull Type type,
                                                @Nonnull Converter converter) {
         T convertedPayload = payloadAs(type, converter);
         //noinspection unchecked
         return ObjectUtils.nullSafeTypeOf(convertedPayload).isAssignableFrom(payloadType())
-                ? (Message<T>) this
-                : new GenericMessage<>(identifier(), type(), convertedPayload, metaData());
+                ? (Message) this
+                : new GenericMessage(identifier(), type(), convertedPayload, metaData());
     }
 }

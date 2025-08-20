@@ -42,9 +42,9 @@ import java.util.Map;
  * @author Steven van Beelen
  * @since 4.6.0
  */
-public class GenericStreamingQueryMessage<P, R>
-        extends GenericQueryMessage<P, Publisher<R>>
-        implements StreamingQueryMessage<P, R> {
+public class GenericStreamingQueryMessage
+        extends GenericQueryMessage
+        implements StreamingQueryMessage {
 
     /**
      * Constructs a {@code GenericStreamingQueryMessage} for the given {@code type}, {@code payload}, and
@@ -58,9 +58,9 @@ public class GenericStreamingQueryMessage<P, R>
      * @param responseType The expected {@link Class response type} for this {@link StreamingQueryMessage}.
      */
     public GenericStreamingQueryMessage(@Nonnull MessageType type,
-                                        @Nullable P payload,
-                                        @Nonnull Class<R> responseType) {
-        this(type, payload, new PublisherResponseType<>(responseType));
+                                        @Nullable Object payload,
+                                        @Nonnull Class<?> responseType) {
+        this(type, payload, (ResponseType<Publisher<?>>)(Object) new PublisherResponseType<>(responseType));
     }
 
     /**
@@ -74,9 +74,9 @@ public class GenericStreamingQueryMessage<P, R>
      * @param responseType The expected {@link ResponseType response type} for this {@link StreamingQueryMessage}.
      */
     public GenericStreamingQueryMessage(@Nonnull MessageType type,
-                                        @Nullable P payload,
-                                        @Nonnull ResponseType<Publisher<R>> responseType) {
-        this(new GenericMessage<>(type, payload, MetaData.emptyInstance()), responseType);
+                                        @Nullable Object payload,
+                                        @Nonnull ResponseType<Publisher<?>> responseType) {
+        this(new GenericMessage(type, payload, MetaData.emptyInstance()), responseType);
     }
 
     /**
@@ -94,9 +94,9 @@ public class GenericStreamingQueryMessage<P, R>
      *                     {@link Message#metaData() metadata} for the {@link SubscriptionQueryMessage} to reconstruct.
      * @param responseType The expected {@link Class response type} for this {@link StreamingQueryMessage}.
      */
-    public GenericStreamingQueryMessage(@Nonnull Message<P> delegate,
-                                        @Nonnull Class<R> responseType) {
-        this(delegate, new PublisherResponseType<>(responseType));
+    public GenericStreamingQueryMessage(@Nonnull Message delegate,
+                                        @Nonnull Class<?> responseType) {
+        this(delegate, (ResponseType<Publisher<?>>)(Object) new PublisherResponseType<>(responseType));
     }
 
     /**
@@ -114,39 +114,44 @@ public class GenericStreamingQueryMessage<P, R>
      *                     {@link Message#metaData() metadata} for the {@link SubscriptionQueryMessage} to reconstruct.
      * @param responseType The expected {@link ResponseType response type} for this {@link StreamingQueryMessage}.
      */
-    public GenericStreamingQueryMessage(@Nonnull Message<P> delegate,
-                                        @Nonnull ResponseType<Publisher<R>> responseType) {
+    public GenericStreamingQueryMessage(@Nonnull Message delegate,
+                                        @Nonnull ResponseType<Publisher<?>> responseType) {
         super(delegate, responseType);
     }
 
     @Override
     @Nonnull
-    public StreamingQueryMessage<P, R> withMetaData(@Nonnull Map<String, String> metaData) {
-        return new GenericStreamingQueryMessage<>(delegate().withMetaData(metaData),
-                                                  responseType());
+    public ResponseType<Publisher<?>> responseType() {
+        return (ResponseType<Publisher<?>>)super.responseType();
     }
 
     @Override
     @Nonnull
-    public StreamingQueryMessage<P, R> andMetaData(@Nonnull Map<String, String> metaData) {
-        return new GenericStreamingQueryMessage<>(delegate().andMetaData(metaData),
-                                                  responseType());
+    public StreamingQueryMessage withMetaData(@Nonnull Map<String, String> metaData) {
+        return new GenericStreamingQueryMessage(delegate().withMetaData(metaData),
+                                                responseType());
     }
 
     @Override
     @Nonnull
-    public <T> StreamingQueryMessage<T, R> withConvertedPayload(@Nonnull Type type, @Nonnull Converter converter) {
+    public StreamingQueryMessage andMetaData(@Nonnull Map<String, String> metaData) {
+        return new GenericStreamingQueryMessage(delegate().andMetaData(metaData), responseType());
+    }
+
+    @Override
+    @Nonnull
+    public <T> StreamingQueryMessage withConvertedPayload(@Nonnull Type type, @Nonnull Converter converter) {
         T convertedPayload = payloadAs(type, converter);
         if (ObjectUtils.nullSafeTypeOf(convertedPayload).isAssignableFrom(payloadType())) {
             //noinspection unchecked
-            return (StreamingQueryMessage<T, R>) super.withConvertedPayload(type, converter);
+            return (StreamingQueryMessage) super.withConvertedPayload(type, converter);
         }
-        Message<P> delegate = delegate();
-        GenericMessage<T> converted = new GenericMessage<>(delegate.identifier(),
+        Message delegate = delegate();
+        GenericMessage converted = new GenericMessage(delegate.identifier(),
                                                            delegate.type(),
                                                            convertedPayload,
                                                            delegate.metaData());
-        return new GenericStreamingQueryMessage<>(converted, responseType());
+        return new GenericStreamingQueryMessage(converted, responseType());
     }
 
     @Override

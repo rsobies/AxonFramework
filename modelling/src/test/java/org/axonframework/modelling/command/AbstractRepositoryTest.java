@@ -48,7 +48,7 @@ class AbstractRepositoryTest {
     private AbstractLegacyRepository<JpaAggregate, AnnotatedAggregate<JpaAggregate>> testSubject;
 
     private AnnotatedAggregate<JpaAggregate> spiedAggregate;
-    private final Message<?> failureMessage = null;
+    private final Message failureMessage = null;
 
     @BeforeEach
     void setUp() {
@@ -228,7 +228,7 @@ class AbstractRepositoryTest {
         var payload = "payload";
         return new GenericDeadlineMessage<>(
                 "deadline-name",
-                new GenericMessage<>(new MessageType(payload.getClass()), payload),
+                new GenericMessage(new MessageType(payload.getClass()), payload),
                 Instant::now
         );
     }

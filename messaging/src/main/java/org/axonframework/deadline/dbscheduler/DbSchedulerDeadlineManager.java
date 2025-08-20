@@ -365,7 +365,7 @@ public class DbSchedulerDeadlineManager extends AbstractDeadlineManager {
                         executeScheduledDeadline(interceptedDeadlineMessage, ctx, scopeDescriptor);
                         return null;
                     });
-            ResultMessage<?> resultMessage = unitOfWork.executeWithResult(chain::proceedSync);
+            ResultMessage resultMessage = unitOfWork.executeWithResult(chain::proceedSync);
             if (resultMessage.isExceptional()) {
                 Throwable e = resultMessage.exceptionResult();
                 span.recordException(e);

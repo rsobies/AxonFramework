@@ -33,7 +33,7 @@ import java.util.Map;
  * @author Steven van Beelen
  * @since 4.4.0
  */
-public interface ResetContext<P> extends Message<P> {
+public interface ResetContext<P> extends Message {
 
     @Override
     @Nonnull
@@ -45,13 +45,13 @@ public interface ResetContext<P> extends Message<P> {
 
     @Override
     @Nonnull
-    default <T> ResetContext<T> withConvertedPayload(@Nonnull Class<T> type, @Nonnull Converter converter) {
+    default ResetContext<?> withConvertedPayload(@Nonnull Class<?> type, @Nonnull Converter converter) {
         return withConvertedPayload((Type) type, converter);
     }
 
     @Override
     @Nonnull
-    default <T> ResetContext<T> withConvertedPayload(@Nonnull TypeReference<T> type, @Nonnull Converter converter) {
+    default ResetContext<?> withConvertedPayload(@Nonnull TypeReference<?> type, @Nonnull Converter converter) {
         return withConvertedPayload(type.getType(), converter);
     }
 

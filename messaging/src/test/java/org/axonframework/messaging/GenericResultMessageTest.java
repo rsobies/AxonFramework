@@ -30,24 +30,24 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author Milan Savic
  */
-class GenericResultMessageTest extends MessageTestSuite<ResultMessage<?>> {
+class GenericResultMessageTest extends MessageTestSuite<ResultMessage> {
 
     @Override
-    protected ResultMessage<?> buildDefaultMessage() {
-        return new GenericResultMessage<>(new GenericMessage<>(
+    protected ResultMessage buildDefaultMessage() {
+        return new GenericResultMessage(new GenericMessage(
                 TEST_IDENTIFIER, TEST_TYPE, TEST_PAYLOAD, TEST_PAYLOAD_TYPE, TEST_META_DATA
         ));
     }
 
     @Override
-    protected <P> ResultMessage<?> buildMessage(@Nullable P payload) {
-        return new GenericResultMessage<>(new MessageType(ObjectUtils.nullSafeTypeOf(payload)), payload);
+    protected <P> ResultMessage buildMessage(@Nullable P payload) {
+        return new GenericResultMessage(new MessageType(ObjectUtils.nullSafeTypeOf(payload)), payload);
     }
 
     @Test
     void exceptionalResult() {
         Throwable t = new Throwable("oops");
-        ResultMessage<?> resultMessage = asResultMessage(t);
+        ResultMessage resultMessage = asResultMessage(t);
         try {
             resultMessage.payload();
         } catch (IllegalPayloadAccessException ipae) {
@@ -58,7 +58,7 @@ class GenericResultMessageTest extends MessageTestSuite<ResultMessage<?>> {
     @Test
     void exceptionSerialization() {
         Throwable expected = new Throwable("oops");
-        ResultMessage<?> resultMessage = asResultMessage(expected);
+        ResultMessage resultMessage = asResultMessage(expected);
         JacksonSerializer jacksonSerializer = JacksonSerializer.builder().build();
         SerializedObject<String> serializedObject =
                 resultMessage.serializeExceptionResult(jacksonSerializer, String.class);

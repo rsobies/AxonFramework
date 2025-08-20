@@ -37,7 +37,7 @@ import java.util.Map;
  * @author Steven van Beelen
  * @since 4.4.0
  */
-public class GenericResetContext<P> extends MessageDecorator<P> implements ResetContext<P> {
+public class GenericResetContext<P> extends MessageDecorator implements ResetContext<P> {
 
     /**
      * Constructs a {@code GenericResetContext} for the given {@code type} and {@code payload}.
@@ -62,7 +62,7 @@ public class GenericResetContext<P> extends MessageDecorator<P> implements Reset
     public GenericResetContext(@Nonnull MessageType type,
                                @Nullable P payload,
                                @Nonnull Map<String, String> metaData) {
-        this(new GenericMessage<>(type, payload, metaData));
+        this(new GenericMessage(type, payload, metaData));
     }
 
     /**
@@ -76,7 +76,7 @@ public class GenericResetContext<P> extends MessageDecorator<P> implements Reset
      *                 {@link Message#identifier() identifier} and {@link Message#metaData() metadata} for the
      *                 {@link EventMessage} to reconstruct.
      */
-    public GenericResetContext(@Nonnull Message<P> delegate) {
+    public GenericResetContext(@Nonnull Message delegate) {
         super(delegate);
     }
 
@@ -100,8 +100,8 @@ public class GenericResetContext<P> extends MessageDecorator<P> implements Reset
             //noinspection unchecked
             return (ResetContext<T>) this;
         }
-        Message<P> delegate = delegate();
-        return new GenericResetContext<>(new GenericMessage<>(delegate.identifier(),
+        Message delegate = delegate();
+        return new GenericResetContext<>(new GenericMessage(delegate.identifier(),
                                                               delegate.type(),
                                                               convertedPayload,
                                                               delegate.metaData()));

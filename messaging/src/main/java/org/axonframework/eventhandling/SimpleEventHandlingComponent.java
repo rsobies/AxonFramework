@@ -42,7 +42,7 @@ public class SimpleEventHandlingComponent implements EventHandlingComponent {
 
     @Nonnull
     @Override
-    public MessageStream.Empty<Message<Void>> handle(@Nonnull EventMessage<?> event,
+    public MessageStream.Empty<Message> handle(@Nonnull EventMessage event,
                                                      @Nonnull ProcessingContext context) {
         QualifiedName name = event.type().qualifiedName();
         // TODO #3103 - add interceptor knowledge

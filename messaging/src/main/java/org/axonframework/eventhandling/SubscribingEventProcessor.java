@@ -45,7 +45,7 @@ import static org.axonframework.common.BuilderUtils.assertNonNull;
  */
 public class SubscribingEventProcessor implements EventProcessor {
 
-    private final SubscribableMessageSource<? extends EventMessage<?>> messageSource;
+    private final SubscribableMessageSource<? extends EventMessage> messageSource;
     private final EventProcessingStrategy processingStrategy;
     private final TransactionalUnitOfWorkFactory transactionalUnitOfWorkFactory;
     private final EventProcessorOperations eventProcessorOperations;
@@ -98,7 +98,7 @@ public class SubscribingEventProcessor implements EventProcessor {
     }
 
     @Override
-    public List<MessageHandlerInterceptor<? super EventMessage<?>>> getHandlerInterceptors() {
+    public List<MessageHandlerInterceptor<? super EventMessage>> getHandlerInterceptors() {
         return eventProcessorOperations.handlerInterceptors();
     }
 
@@ -136,7 +136,7 @@ public class SubscribingEventProcessor implements EventProcessor {
      *
      * @param eventMessages The messages to process
      */
-    protected void process(List<? extends EventMessage<?>> eventMessages) {
+    protected void process(List<? extends EventMessage> eventMessages) {
         try {
             var unitOfWork = transactionalUnitOfWorkFactory.create();
             eventProcessorOperations.processInUnitOfWork(eventMessages, unitOfWork);
@@ -166,13 +166,13 @@ public class SubscribingEventProcessor implements EventProcessor {
      *
      * @return the MessageSource from which the processor receives its events
      */
-    public SubscribableMessageSource<? extends EventMessage<?>> getMessageSource() {
+    public SubscribableMessageSource<? extends EventMessage> getMessageSource() {
         return messageSource;
     }
 
     @Override
     public Registration registerHandlerInterceptor(
-            @Nonnull MessageHandlerInterceptor<? super EventMessage<?>> handlerInterceptor) {
+            @Nonnull MessageHandlerInterceptor<? super EventMessage> handlerInterceptor) {
         return eventProcessorOperations.registerHandlerInterceptor(handlerInterceptor);
     }
 
@@ -189,7 +189,7 @@ public class SubscribingEventProcessor implements EventProcessor {
      */
     public static class Builder extends EventProcessorBuilder {
 
-        private SubscribableMessageSource<? extends EventMessage<?>> messageSource;
+        private SubscribableMessageSource<? extends EventMessage> messageSource;
         private EventProcessingStrategy processingStrategy = DirectEventProcessingStrategy.INSTANCE;
         private TransactionManager transactionManager = NoTransactionManager.INSTANCE;
 
@@ -222,7 +222,7 @@ public class SubscribingEventProcessor implements EventProcessor {
         }
 
         @Override
-        public Builder messageMonitor(@Nonnull MessageMonitor<? super EventMessage<?>> messageMonitor) {
+        public Builder messageMonitor(@Nonnull MessageMonitor<? super EventMessage> messageMonitor) {
             super.messageMonitor(messageMonitor);
             return this;
         }
@@ -242,7 +242,7 @@ public class SubscribingEventProcessor implements EventProcessor {
          *                      {@link EventMessage}s
          * @return the current Builder instance, for fluent interfacing
          */
-        public Builder messageSource(@Nonnull SubscribableMessageSource<? extends EventMessage<?>> messageSource) {
+        public Builder messageSource(@Nonnull SubscribableMessageSource<? extends EventMessage> messageSource) {
             assertNonNull(messageSource, "SubscribableMessageSource may not be null");
             this.messageSource = messageSource;
             return this;

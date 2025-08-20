@@ -35,7 +35,7 @@ import java.util.function.Supplier;
  * @author Steven van Beelen
  * @since 2.0.0
  */
-public class GenericDomainEventMessage<P> extends GenericEventMessage<P> implements DomainEventMessage<P> {
+public class GenericDomainEventMessage extends GenericEventMessage implements DomainEventMessage {
 
     private final String aggregateType;
     private final String aggregateIdentifier;
@@ -57,7 +57,7 @@ public class GenericDomainEventMessage<P> extends GenericEventMessage<P> impleme
                                      String aggregateIdentifier,
                                      long sequenceNumber,
                                      @Nonnull MessageType type,
-                                     @Nonnull P payload) {
+                                     @Nonnull Object payload) {
         this(aggregateType, aggregateIdentifier, sequenceNumber, type, payload, MetaData.emptyInstance());
     }
 
@@ -77,12 +77,12 @@ public class GenericDomainEventMessage<P> extends GenericEventMessage<P> impleme
                                      String aggregateIdentifier,
                                      long sequenceNumber,
                                      @Nonnull MessageType type,
-                                     @Nonnull P payload,
+                                     @Nonnull Object payload,
                                      @Nonnull Map<String, String> metaData) {
         this(aggregateType,
              aggregateIdentifier,
              sequenceNumber,
-             new GenericMessage<>(type, payload, metaData),
+             new GenericMessage(type, payload, metaData),
              clock.instant());
     }
 
@@ -106,13 +106,13 @@ public class GenericDomainEventMessage<P> extends GenericEventMessage<P> impleme
                                      long sequenceNumber,
                                      @Nonnull String messageIdentifier,
                                      @Nonnull MessageType type,
-                                     @Nonnull P payload,
+                                     @Nonnull Object payload,
                                      @Nonnull Map<String, String> metaData,
                                      @Nonnull Instant timestamp) {
         this(aggregateType,
              aggregateIdentifier,
              sequenceNumber,
-             new GenericMessage<>(messageIdentifier, type, payload, metaData),
+             new GenericMessage(messageIdentifier, type, payload, metaData),
              timestamp);
     }
 
@@ -140,7 +140,7 @@ public class GenericDomainEventMessage<P> extends GenericEventMessage<P> impleme
     public GenericDomainEventMessage(String aggregateType,
                                      String aggregateIdentifier,
                                      long sequenceNumber,
-                                     @Nonnull Message<P> delegate,
+                                     @Nonnull Message delegate,
                                      @Nonnull Supplier<Instant> timestampSupplier) {
         super(delegate, timestampSupplier);
         this.aggregateType = aggregateType;
@@ -173,7 +173,7 @@ public class GenericDomainEventMessage<P> extends GenericEventMessage<P> impleme
     public GenericDomainEventMessage(String aggregateType,
                                      String aggregateIdentifier,
                                      long sequenceNumber,
-                                     @Nonnull Message<P> delegate,
+                                     @Nonnull Message delegate,
                                      @Nonnull Instant timestamp) {
         super(delegate, timestamp);
         this.aggregateType = aggregateType;
@@ -198,11 +198,11 @@ public class GenericDomainEventMessage<P> extends GenericEventMessage<P> impleme
 
     @Override
     @Nonnull
-    public GenericDomainEventMessage<P> withMetaData(@Nonnull Map<String, String> metaData) {
+    public GenericDomainEventMessage withMetaData(@Nonnull Map<String, String> metaData) {
         if (metaData().equals(metaData)) {
             return this;
         }
-        return new GenericDomainEventMessage<>(aggregateType,
+        return new GenericDomainEventMessage(aggregateType,
                                                aggregateIdentifier,
                                                sequenceNumber,
                                                delegate().withMetaData(metaData),
@@ -211,12 +211,12 @@ public class GenericDomainEventMessage<P> extends GenericEventMessage<P> impleme
 
     @Override
     @Nonnull
-    public GenericDomainEventMessage<P> andMetaData(@Nonnull Map<String, String> metaData) {
+    public GenericDomainEventMessage andMetaData(@Nonnull Map<String, String> metaData) {
         //noinspection ConstantConditions
         if (metaData == null || metaData.isEmpty() || metaData().equals(metaData)) {
             return this;
         }
-        return new GenericDomainEventMessage<>(aggregateType,
+        return new GenericDomainEventMessage(aggregateType,
                                                aggregateIdentifier,
                                                sequenceNumber,
                                                delegate().andMetaData(metaData),

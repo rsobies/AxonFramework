@@ -102,10 +102,10 @@ class EventBufferTest {
         eventStream.onNext(TEST_EVENT_WITH_TOKEN);
         assertTrue(testSubject.hasNextAvailable());
 
-        TrackedEventMessage<?> peeked =
+        TrackedEventMessage peeked =
                 testSubject.peek().orElseThrow(() -> new AssertionError("Expected value to be available"));
         assertEquals(new GlobalSequenceTrackingToken(1L), peeked.trackingToken());
-        assertTrue(peeked instanceof DomainEventMessage<?>);
+        assertTrue(peeked instanceof DomainEventMessage);
 
         assertTrue(testSubject.hasNextAvailable());
         assertTrue(testSubject.hasNextAvailable(1, TimeUnit.SECONDS));

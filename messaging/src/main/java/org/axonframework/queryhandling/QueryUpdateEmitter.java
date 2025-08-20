@@ -46,7 +46,7 @@ import jakarta.annotation.Nullable;
  * @author Milan Savic
  * @since 3.3
  */
-public interface QueryUpdateEmitter extends MessageDispatchInterceptorSupport<SubscriptionQueryUpdateMessage<?>> {
+public interface QueryUpdateEmitter extends MessageDispatchInterceptorSupport<SubscriptionQueryUpdateMessage> {
 
     /**
      * Emits incremental update (as return value of provided update function) to subscription queries matching given
@@ -57,7 +57,7 @@ public interface QueryUpdateEmitter extends MessageDispatchInterceptorSupport<Su
      * @param <U>    the type of the update
      */
     <U> void emit(@Nonnull Predicate<SubscriptionQueryMessage<?, ?, U>> filter,
-                  @Nonnull SubscriptionQueryUpdateMessage<U> update);
+                  @Nonnull SubscriptionQueryUpdateMessage update);
 
     /**
      * Emits given incremental update to subscription queries matching given filter. If an {@code update} is {@code
@@ -86,26 +86,26 @@ public interface QueryUpdateEmitter extends MessageDispatchInterceptorSupport<Su
      */
     @Deprecated
     @SuppressWarnings("unchecked")
-    private static <U> SubscriptionQueryUpdateMessage<U> asUpdateMessage(Object payload) {
+    private static <U> SubscriptionQueryUpdateMessage asUpdateMessage(Object payload) {
         if (payload instanceof SubscriptionQueryUpdateMessage) {
-            return (SubscriptionQueryUpdateMessage<U>) payload;
+            return (SubscriptionQueryUpdateMessage) payload;
         } else if (payload instanceof ResultMessage) {
-            ResultMessage<U> resultMessage = (ResultMessage<U>) payload;
+            ResultMessage resultMessage = (ResultMessage) payload;
             if (resultMessage.isExceptional()) {
                 Throwable cause = resultMessage.exceptionResult();
-                return new GenericSubscriptionQueryUpdateMessage<>(
+                return new GenericSubscriptionQueryUpdateMessage(
                         new MessageType(cause.getClass()),
                         cause,
                         resultMessage.payloadType(),
                         resultMessage.metaData()
                 );
             }
-            return new GenericSubscriptionQueryUpdateMessage<>(resultMessage);
+            return new GenericSubscriptionQueryUpdateMessage(resultMessage);
         } else if (payload instanceof Message) {
-            return new GenericSubscriptionQueryUpdateMessage<>((Message<U>) payload);
+            return new GenericSubscriptionQueryUpdateMessage((Message) payload);
         }
         // TODO #3085 use MessageNameResolver below
-        return new GenericSubscriptionQueryUpdateMessage<>(new MessageType(payload.getClass()), (U) payload);
+        return new GenericSubscriptionQueryUpdateMessage(new MessageType(payload.getClass()), (U) payload);
     }
 
     /**
@@ -120,7 +120,7 @@ public interface QueryUpdateEmitter extends MessageDispatchInterceptorSupport<Su
     @SuppressWarnings("unchecked")
     default <Q, U> void emit(@Nonnull Class<Q> queryType,
                              @Nonnull Predicate<? super Q> filter,
-                             @Nonnull SubscriptionQueryUpdateMessage<U> update) {
+                             @Nonnull SubscriptionQueryUpdateMessage update) {
         Predicate<SubscriptionQueryMessage<?, ?, U>> sqmFilter =
                 m -> queryType.isAssignableFrom(m.payloadType()) && filter.test((Q) m.payload());
         emit(sqmFilter, update);
@@ -205,7 +205,7 @@ public interface QueryUpdateEmitter extends MessageDispatchInterceptorSupport<Su
      * @param <U>              the incremental response types of the query
      * @return the object which contains updates and a registration which can be used to cancel them
      */
-    <U> UpdateHandlerRegistration<U> registerUpdateHandler(@Nonnull SubscriptionQueryMessage<?, ?, ?> query,
+    <U> UpdateHandlerRegistration registerUpdateHandler(@Nonnull SubscriptionQueryMessage<?, ?, ?> query,
                                                            int updateBufferSize);
 
     /**

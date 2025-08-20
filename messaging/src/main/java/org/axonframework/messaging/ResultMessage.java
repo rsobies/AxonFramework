@@ -33,7 +33,7 @@ import java.util.Optional;
  * @author Milan Savic
  * @since 4.0.0
  */
-public interface ResultMessage<R> extends Message<R> {
+public interface ResultMessage extends Message {
 
     /**
      * Indicates whether the ResultMessage represents unsuccessful execution.
@@ -110,25 +110,25 @@ public interface ResultMessage<R> extends Message<R> {
 
     @Override
     @Nonnull
-    ResultMessage<R> withMetaData(@Nonnull Map<String, String> metaData);
+    ResultMessage withMetaData(@Nonnull Map<String, String> metaData);
 
     @Override
     @Nonnull
-    ResultMessage<R> andMetaData(@Nonnull Map<String, String> metaData);
+    ResultMessage andMetaData(@Nonnull Map<String, String> metaData);
 
     @Override
     @Nonnull
-    default <T> ResultMessage<T> withConvertedPayload(@Nonnull Class<T> type, @Nonnull Converter converter) {
+    default ResultMessage withConvertedPayload(@Nonnull Class<?> type, @Nonnull Converter converter) {
         return withConvertedPayload((Type) type, converter);
     }
 
     @Override
     @Nonnull
-    default <T> ResultMessage<T> withConvertedPayload(@Nonnull TypeReference<T> type, @Nonnull Converter converter) {
+    default ResultMessage withConvertedPayload(@Nonnull TypeReference<?> type, @Nonnull Converter converter) {
         return withConvertedPayload(type.getType(), converter);
     }
 
     @Override
     @Nonnull
-    <T> ResultMessage<T> withConvertedPayload(@Nonnull Type type, @Nonnull Converter converter);
+    <T> ResultMessage withConvertedPayload(@Nonnull Type type, @Nonnull Converter converter);
 }

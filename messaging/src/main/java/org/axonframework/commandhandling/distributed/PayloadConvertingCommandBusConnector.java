@@ -60,9 +60,9 @@ public class PayloadConvertingCommandBusConnector<T> extends DelegatingCommandBu
 
     @Nonnull
     @Override
-    public CompletableFuture<CommandResultMessage<?>> dispatch(@Nonnull CommandMessage<?> command,
+    public CompletableFuture<CommandResultMessage<?>> dispatch(@Nonnull CommandMessage command,
                                                                @Nullable ProcessingContext processingContext) {
-        CommandMessage<?> serializedCommand = command.withConvertedPayload(targetType, converter);
+        CommandMessage serializedCommand = command.withConvertedPayload(targetType, converter);
         return delegate.dispatch(serializedCommand, processingContext);
     }
 

@@ -192,8 +192,8 @@ public class DeadlineManagerValidator {
         );
     }
 
-    private Matcher<Message<?>>[] createDeadlineTypeMatchers(Class<?>[] expectedDeadlineTypes) {
-        List<Matcher<Message<?>>> matchers = new ArrayList<>(expectedDeadlineTypes.length);
+    private Matcher<Message>[] createDeadlineTypeMatchers(Class<?>[] expectedDeadlineTypes) {
+        List<Matcher<Message>> matchers = new ArrayList<>(expectedDeadlineTypes.length);
         for (Class<?> deadlineType : expectedDeadlineTypes) {
             matchers.add(messageWithPayload(any(deadlineType)));
         }

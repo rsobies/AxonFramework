@@ -40,7 +40,7 @@ import java.util.function.Supplier;
  * @author Steven van Beelen
  * @since 3.3.0
  */
-public class GenericDeadlineMessage<P> extends GenericEventMessage<P> implements DeadlineMessage<P> {
+public class GenericDeadlineMessage<P> extends GenericEventMessage implements DeadlineMessage<P> {
 
     private final String deadlineName;
 
@@ -129,7 +129,7 @@ public class GenericDeadlineMessage<P> extends GenericEventMessage<P> implements
      *                          {@link DeadlineMessage DeadlineMessage's} creation.
      */
     public GenericDeadlineMessage(@Nonnull String deadlineName,
-                                  @Nonnull Message<P> delegate,
+                                  @Nonnull Message delegate,
                                   @Nonnull Supplier<Instant> timestampSupplier) {
         super(delegate, timestampSupplier);
         this.deadlineName = deadlineName;
@@ -163,8 +163,8 @@ public class GenericDeadlineMessage<P> extends GenericEventMessage<P> implements
             //noinspection unchecked
             return (DeadlineMessage<T>) this;
         }
-        Message<P> delegate = delegate();
-        Message<T> converted = new GenericMessage<>(delegate.identifier(),
+        Message delegate = delegate();
+        Message converted = new GenericMessage(delegate.identifier(),
                                                     delegate.type(),
                                                     convertedPayload,
                                                     delegate.metaData());

@@ -64,8 +64,8 @@ public class AnnotatedAggregateTest {
     @Test
     void applyingMultipleEventsInAndThenPublishesWithRightState() {
         Command testPayload = new Command(ID, 2);
-        CommandMessage<Object> testCommand = new GenericCommandMessage<>(TEST_COMMAND_TYPE, testPayload);
-        LegacyDefaultUnitOfWork<CommandMessage<Object>> uow = LegacyDefaultUnitOfWork.startAndGet(testCommand);
+        CommandMessage testCommand = new GenericCommandMessage(TEST_COMMAND_TYPE, testPayload);
+        LegacyDefaultUnitOfWork<CommandMessage> uow = LegacyDefaultUnitOfWork.startAndGet(testCommand);
 
         Aggregate<AggregateRoot> aggregate =
                 uow.executeWithResult((ctx) -> repository.newInstance(() -> {
@@ -77,17 +77,17 @@ public class AnnotatedAggregateTest {
         assertNotNull(aggregate);
 
         InOrder inOrder = inOrder(eventBus);
-        inOrder.verify(eventBus).publish(argThat((ArgumentMatcher<EventMessage<?>>) x -> Event_1.class
+        inOrder.verify(eventBus).publish(argThat((ArgumentMatcher<EventMessage>) x -> Event_1.class
                 .equals(x.payloadType()) && ((Event_1) x.payload()).value == 1));
-        inOrder.verify(eventBus).publish(argThat((ArgumentMatcher<EventMessage<?>>) x -> Event_1.class
+        inOrder.verify(eventBus).publish(argThat((ArgumentMatcher<EventMessage>) x -> Event_1.class
                 .equals(x.payloadType()) && ((Event_1) x.payload()).value == 2));
     }
 
     @Test
     void applyingEventInHandlerPublishesInRightOrder() {
         Command testPayload = new Command(ID, 0);
-        CommandMessage<Object> testCommand = new GenericCommandMessage<>(TEST_COMMAND_TYPE, testPayload);
-        LegacyDefaultUnitOfWork<CommandMessage<Object>> uow = LegacyDefaultUnitOfWork.startAndGet(testCommand);
+        CommandMessage testCommand = new GenericCommandMessage(TEST_COMMAND_TYPE, testPayload);
+        LegacyDefaultUnitOfWork<CommandMessage> uow = LegacyDefaultUnitOfWork.startAndGet(testCommand);
 
         Aggregate<AggregateRoot> aggregate =
                 uow.executeWithResult((ctx) -> repository.newInstance(() -> {
@@ -99,9 +99,9 @@ public class AnnotatedAggregateTest {
         assertNotNull(aggregate);
 
         InOrder inOrder = inOrder(eventBus);
-        inOrder.verify(eventBus).publish(argThat((ArgumentMatcher<EventMessage<?>>) x -> Event_1.class
+        inOrder.verify(eventBus).publish(argThat((ArgumentMatcher<EventMessage>) x -> Event_1.class
                 .equals(x.payloadType())));
-        inOrder.verify(eventBus).publish(argThat((ArgumentMatcher<EventMessage<?>>) x -> Event_2.class
+        inOrder.verify(eventBus).publish(argThat((ArgumentMatcher<EventMessage>) x -> Event_2.class
                 .equals(x.payloadType())));
     }
 
@@ -109,8 +109,8 @@ public class AnnotatedAggregateTest {
     @Test
     void lastSequenceReturnsNullIfNoEventsHaveBeenPublishedYet() {
         final Command testPayload = new Command(ID, 0);
-        CommandMessage<Object> testCommand = new GenericCommandMessage<>(TEST_COMMAND_TYPE, testPayload);
-        LegacyDefaultUnitOfWork<CommandMessage<Object>> uow = LegacyDefaultUnitOfWork.startAndGet(testCommand);
+        CommandMessage testCommand = new GenericCommandMessage(TEST_COMMAND_TYPE, testPayload);
+        LegacyDefaultUnitOfWork<CommandMessage> uow = LegacyDefaultUnitOfWork.startAndGet(testCommand);
 
         AnnotatedAggregate<AggregateRoot> testSubject =
                 (AnnotatedAggregate<AggregateRoot>) uow.executeWithResult(
@@ -123,8 +123,8 @@ public class AnnotatedAggregateTest {
     @ValueSource(booleans = {false, true})
     void conditionalApplyingEventInHandlerPublishesInRightOrder(boolean applyConditional) {
         Command_2 testPayload = new Command_2(ID, 0, applyConditional);
-        CommandMessage<Object> testCommand = new GenericCommandMessage<>(TEST_COMMAND_TYPE, testPayload);
-        LegacyDefaultUnitOfWork<CommandMessage<Object>> uow = LegacyDefaultUnitOfWork.startAndGet(testCommand);
+        CommandMessage testCommand = new GenericCommandMessage(TEST_COMMAND_TYPE, testPayload);
+        LegacyDefaultUnitOfWork<CommandMessage> uow = LegacyDefaultUnitOfWork.startAndGet(testCommand);
 
         Aggregate<AggregateRoot> aggregate =
                 uow.executeWithResult((ctx) -> repository.newInstance(() -> {
@@ -136,13 +136,13 @@ public class AnnotatedAggregateTest {
         assertNotNull(aggregate);
 
         InOrder inOrderEvents = inOrder(eventBus);
-        inOrderEvents.verify(eventBus).publish(argThat((ArgumentMatcher<EventMessage<?>>) x -> Event_1.class
+        inOrderEvents.verify(eventBus).publish(argThat((ArgumentMatcher<EventMessage>) x -> Event_1.class
                 .equals(x.payloadType())));
         if (applyConditional) {
-            inOrderEvents.verify(eventBus).publish(argThat((ArgumentMatcher<EventMessage<?>>) x -> Event_2.class
+            inOrderEvents.verify(eventBus).publish(argThat((ArgumentMatcher<EventMessage>) x -> Event_2.class
                     .equals(x.payloadType())));
         }
-        inOrderEvents.verify(eventBus).publish(argThat((ArgumentMatcher<EventMessage<?>>) x -> Event_3.class
+        inOrderEvents.verify(eventBus).publish(argThat((ArgumentMatcher<EventMessage>) x -> Event_3.class
                 .equals(x.payloadType())));
 
         InOrder inOrderSideEffect = inOrder(sideEffect);

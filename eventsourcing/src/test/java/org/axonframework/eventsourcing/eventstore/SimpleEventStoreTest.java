@@ -88,11 +88,11 @@ class SimpleEventStoreTest {
         void openStreamDelegatesConditionToStorageEngine() {
             // given
             StreamingCondition condition = aStreamingCondition();
-            MessageStream<EventMessage<?>> expectedStream = mock(MessageStream.class);
+            MessageStream<EventMessage> expectedStream = mock(MessageStream.class);
             when(mockStorageEngine.stream(condition)).thenReturn(expectedStream);
 
             // when
-            MessageStream<EventMessage<?>> result = testSubject.open(condition);
+            MessageStream<EventMessage> result = testSubject.open(condition);
 
             // then
             assertSame(expectedStream, result);
@@ -241,8 +241,8 @@ class SimpleEventStoreTest {
             when(mockAppendTransaction.commit()).thenReturn(completedFuture(mock(ConsistencyMarker.class)));
             when(mockStorageEngine.appendEvents(any(), anyList())).thenReturn(completedFuture(mockAppendTransaction));
 
-            EventMessage<?> testEventZero = createEvent(0);
-            EventMessage<?> testEventOne = createEvent(1);
+            EventMessage testEventZero = createEvent(0);
+            EventMessage testEventOne = createEvent(1);
 
             UnitOfWork uow = new UnitOfWork();
             uow.onPreInvocation(context -> {
@@ -265,7 +265,7 @@ class SimpleEventStoreTest {
             when(mockStorageEngine.appendEvents(any(), anyList())).thenReturn(completedFuture(mockAppendTransaction));
             Tag testTag = new Tag("id", "value");
             when(tagResolver.resolve(any())).thenReturn(Set.of(testTag));
-            EventMessage<?> testEvent = createEvent(0);
+            EventMessage testEvent = createEvent(0);
             //noinspection unchecked
             ArgumentCaptor<List<TaggedEventMessage<?>>> eventCaptor = ArgumentCaptor.forClass(List.class);
 
@@ -297,7 +297,7 @@ class SimpleEventStoreTest {
         verify(descriptor).describeProperty("eventStorageEngine", mockStorageEngine);
     }
 
-    private static @Nonnull MessageStream<EventMessage<?>> messageStreamOf(int messageCount) {
+    private static @Nonnull MessageStream<EventMessage> messageStreamOf(int messageCount) {
         return MessageStream.fromStream(
                 IntStream.range(0, messageCount).boxed(),
                 EventTestUtils::createEvent,
@@ -306,9 +306,9 @@ class SimpleEventStoreTest {
     }
 
     @SafeVarargs
-    private void doConsumeAll(MessageStream<? extends EventMessage<?>>... sources) {
+    private void doConsumeAll(MessageStream<? extends EventMessage>... sources) {
         try {
-            for (MessageStream<? extends EventMessage<?>> source : sources) {
+            for (MessageStream<? extends EventMessage> source : sources) {
                 source.reduce(new Object(), (o, m) -> m)
                       .get(5, TimeUnit.SECONDS);
             }

@@ -32,7 +32,7 @@ import java.util.concurrent.CompletableFuture;
  * @author Allard Buijze
  * @since 1.2
  */
-public interface EventProcessor extends MessageHandlerInterceptorSupport<EventMessage<?>> {
+public interface EventProcessor extends MessageHandlerInterceptorSupport<EventMessage> {
 
     /**
      * Returns the name of this event processor. This name is used to detect distributed instances of the
@@ -49,7 +49,7 @@ public interface EventProcessor extends MessageHandlerInterceptorSupport<EventMe
      *
      * @return the list of registered interceptors of this event processor
      */
-    List<MessageHandlerInterceptor<? super EventMessage<?>>> getHandlerInterceptors();
+    List<MessageHandlerInterceptor<? super EventMessage>> getHandlerInterceptors();
 
     /**
      * Start processing events.

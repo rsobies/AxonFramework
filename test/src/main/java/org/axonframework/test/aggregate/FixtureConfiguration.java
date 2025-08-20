@@ -168,7 +168,7 @@ public interface FixtureConfiguration<T> {
      * @param commandHandler The handler to register
      * @return the current FixtureConfiguration, for fluent interfacing
      */
-    FixtureConfiguration<T> registerCommandHandler(Class<?> payloadType, MessageHandler<CommandMessage<?>, CommandResultMessage<?>> commandHandler);
+    FixtureConfiguration<T> registerCommandHandler(Class<?> payloadType, MessageHandler<CommandMessage, CommandResultMessage<?>> commandHandler);
 
     /**
      * Registers a {@code commandHandler} to handle commands of the given {@code commandType} with the
@@ -178,7 +178,7 @@ public interface FixtureConfiguration<T> {
      * @param commandHandler The handler to register
      * @return the current FixtureConfiguration, for fluent interfacing
      */
-    FixtureConfiguration<T> registerCommandHandler(String commandName, MessageHandler<CommandMessage<?>, CommandResultMessage<?>> commandHandler);
+    FixtureConfiguration<T> registerCommandHandler(String commandName, MessageHandler<CommandMessage, CommandResultMessage<?>> commandHandler);
 
     /**
      * Registers a resource that is eligible for injection in handler method (e.g. methods annotated with {@link
@@ -230,7 +230,7 @@ public interface FixtureConfiguration<T> {
      * @return the current FixtureConfiguration, for fluent interfacing
      */
     FixtureConfiguration<T> registerCommandDispatchInterceptor(
-            MessageDispatchInterceptor<? super CommandMessage<?>> commandDispatchInterceptor
+            MessageDispatchInterceptor<? super CommandMessage> commandDispatchInterceptor
     );
 
     /**
@@ -243,7 +243,7 @@ public interface FixtureConfiguration<T> {
      * @return the current FixtureConfiguration, for fluent interfacing
      */
     FixtureConfiguration<T> registerCommandHandlerInterceptor(
-            MessageHandlerInterceptor<? super CommandMessage<?>> commandHandlerInterceptor
+            MessageHandlerInterceptor<? super CommandMessage> commandHandlerInterceptor
     );
 
     /**

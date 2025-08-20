@@ -86,7 +86,7 @@ public abstract class IntermediateSpanFactoryTest<BI, SI> {
         testDefinition.getExpectedSpan().assertSpan(span);
     }
 
-    protected <M extends Message<?>> void testContextPropagation(M message, BiConsumer<SI, M> invocation) {
+    protected <M extends Message> void testContextPropagation(M message, BiConsumer<SI, M> invocation) {
         SI siSpanFactory = createFactoryBasedOnBuilder(createBuilder(this.spanFactory));
         this.spanFactory.createRootTrace(() -> "dummy trace").run(() -> {
             invocation.accept(siSpanFactory, message);
@@ -150,7 +150,7 @@ public abstract class IntermediateSpanFactoryTest<BI, SI> {
         private final String name;
         private final TestSpanFactory.TestSpanType type;
         private final Map<String, String> attributes = new HashMap<>();
-        private Message<?> message = null;
+        private Message message = null;
 
         private ExpectedSpan(String name, TestSpanFactory.TestSpanType type) {
             this.name = name;
@@ -162,7 +162,7 @@ public abstract class IntermediateSpanFactoryTest<BI, SI> {
             return this;
         }
 
-        public ExpectedSpan withMessage(Message<?> message) {
+        public ExpectedSpan withMessage(Message message) {
             this.message = message;
             return this;
         }

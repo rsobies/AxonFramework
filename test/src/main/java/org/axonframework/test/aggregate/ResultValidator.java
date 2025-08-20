@@ -67,7 +67,7 @@ public interface ResultValidator<T> {
      * @param expectedEvents The expected events, in the exact order they are expected to be dispatched and stored.
      * @return the current ResultValidator, for fluent interfacing
      */
-    ResultValidator<T> expectEvents(EventMessage<?>... expectedEvents);
+    ResultValidator<T> expectEvents(EventMessage... expectedEvents);
 
     /**
      * Expect no events to have been published from the command.
@@ -86,7 +86,7 @@ public interface ResultValidator<T> {
      * @param matcher The matcher to match with the actually published events
      * @return the current ResultValidator, for fluent interfacing
      */
-    ResultValidator<T> expectEventsMatching(Matcher<? extends List<? super EventMessage<?>>> matcher);
+    ResultValidator<T> expectEventsMatching(Matcher<? extends List<? super EventMessage>> matcher);
 
     /**
      * Expect the command handler to return the given {@code expectedPayload} after execution. The actual and expected

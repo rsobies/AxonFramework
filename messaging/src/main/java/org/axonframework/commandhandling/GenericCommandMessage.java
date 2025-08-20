@@ -39,7 +39,7 @@ import java.util.OptionalInt;
  * @author Steven van Beelen
  * @since 2.0.0
  */
-public class GenericCommandMessage<P> extends MessageDecorator<P> implements CommandMessage<P> {
+public class GenericCommandMessage extends MessageDecorator implements CommandMessage {
 
     private final String routingKey;
     private final Integer priority;
@@ -53,7 +53,7 @@ public class GenericCommandMessage<P> extends MessageDecorator<P> implements Com
      * @param payload The payload of type {@code P} for this {@link CommandMessage}.
      */
     public GenericCommandMessage(@Nonnull MessageType type,
-                                 @Nullable P payload) {
+                                 @Nullable Object payload) {
         this(type, payload, MetaData.emptyInstance());
     }
 
@@ -65,9 +65,9 @@ public class GenericCommandMessage<P> extends MessageDecorator<P> implements Com
      * @param metaData The metadata for this {@link CommandMessage}.
      */
     public GenericCommandMessage(@Nonnull MessageType type,
-                                 @Nullable P payload,
+                                 @Nullable Object payload,
                                  @Nonnull Map<String, String> metaData) {
-        this(new GenericMessage<>(type, payload, metaData));
+        this(new GenericMessage(type, payload, metaData));
     }
 
 
@@ -83,11 +83,11 @@ public class GenericCommandMessage<P> extends MessageDecorator<P> implements Com
      * @param priority   The priority for this {@link CommandMessage}, if any.
      */
     public GenericCommandMessage(@Nonnull MessageType type,
-                                 @Nonnull P payload,
+                                 @Nonnull Object payload,
                                  @Nonnull Map<String, String> metaData,
                                  @Nullable String routingKey,
                                  @Nullable Integer priority) {
-        this(new GenericMessage<>(type, payload, metaData), routingKey, priority);
+        this(new GenericMessage(type, payload, metaData), routingKey, priority);
     }
 
     /**
@@ -104,7 +104,7 @@ public class GenericCommandMessage<P> extends MessageDecorator<P> implements Com
      *                 {@link Message#type() qualifiedName}, {@link Message#identifier() identifier} and
      *                 {@link Message#metaData() metadata} for the {@link CommandMessage} to reconstruct.
      */
-    public GenericCommandMessage(@Nonnull Message<P> delegate) {
+    public GenericCommandMessage(@Nonnull Message delegate) {
         this(delegate, null, null);
     }
 
@@ -125,7 +125,7 @@ public class GenericCommandMessage<P> extends MessageDecorator<P> implements Com
      * @param routingKey The routing key for this {@link CommandMessage}, if any.
      * @param priority   The priority for this {@link CommandMessage}, if any.
      */
-    public GenericCommandMessage(@Nonnull Message<P> delegate,
+    public GenericCommandMessage(@Nonnull Message delegate,
                                  @Nullable String routingKey,
                                  @Nullable Integer priority) {
         super(delegate);
@@ -148,30 +148,30 @@ public class GenericCommandMessage<P> extends MessageDecorator<P> implements Com
 
     @Override
     @Nonnull
-    public CommandMessage<P> withMetaData(@Nonnull Map<String, String> metaData) {
-        return new GenericCommandMessage<>(delegate().withMetaData(metaData));
+    public CommandMessage withMetaData(@Nonnull Map<String, String> metaData) {
+        return new GenericCommandMessage(delegate().withMetaData(metaData));
     }
 
     @Override
     @Nonnull
-    public CommandMessage<P> andMetaData(@Nonnull Map<String, String> metaData) {
-        return new GenericCommandMessage<>(delegate().andMetaData(metaData));
+    public CommandMessage andMetaData(@Nonnull Map<String, String> metaData) {
+        return new GenericCommandMessage(delegate().andMetaData(metaData));
     }
 
     @Override
     @Nonnull
-    public <T> CommandMessage<T> withConvertedPayload(@Nonnull Type type, @Nonnull Converter converter) {
+    public <T> CommandMessage withConvertedPayload(@Nonnull Type type, @Nonnull Converter converter) {
         T convertedPayload = payloadAs(type, converter);
         if (ObjectUtils.nullSafeTypeOf(convertedPayload).isAssignableFrom(payloadType())) {
             //noinspection unchecked
-            return (CommandMessage<T>) this;
+            return (CommandMessage) this;
         }
-        Message<P> delegate = delegate();
-        Message<T> converted = new GenericMessage<>(delegate.identifier(),
+        Message delegate = delegate();
+        Message converted = new GenericMessage(delegate.identifier(),
                                                     delegate.type(),
                                                     convertedPayload,
                                                     delegate.metaData());
-        return new GenericCommandMessage<>(converted, routingKey, priority);
+        return new GenericCommandMessage(converted, routingKey, priority);
     }
 
     @Override

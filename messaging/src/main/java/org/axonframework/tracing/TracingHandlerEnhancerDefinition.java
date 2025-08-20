@@ -80,7 +80,7 @@ public class TracingHandlerEnhancerDefinition implements HandlerEnhancerDefiniti
         String signature = toMethodSignature(unwrap.get());
         return new WrappedMessageHandlingMember<T>(original) {
             @Override
-            public Object handleSync(@Nonnull Message<?> message, @Nonnull ProcessingContext context, T target)
+            public Object handleSync(@Nonnull Message message, @Nonnull ProcessingContext context, T target)
                     throws Exception {
                 return spanFactory.createInternalSpan(() -> getSpanName(target, signature))
                                   .runCallable(() -> super.handleSync(message, context, target));

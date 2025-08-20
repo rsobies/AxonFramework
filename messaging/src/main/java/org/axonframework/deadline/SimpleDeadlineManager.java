@@ -381,7 +381,7 @@ public class SimpleDeadlineManager extends AbstractDeadlineManager {
                                                                                    deadlineId.getDeadlineScope());
                                                           return null;
                                                       });
-                ResultMessage<?> resultMessage = unitOfWork.executeWithResult(chain::proceedSync);
+                ResultMessage resultMessage = unitOfWork.executeWithResult(chain::proceedSync);
                 if (resultMessage.isExceptional()) {
                     Throwable e = resultMessage.exceptionResult();
                     logger.error("An error occurred while triggering the deadline [{}] with identifier [{}]",

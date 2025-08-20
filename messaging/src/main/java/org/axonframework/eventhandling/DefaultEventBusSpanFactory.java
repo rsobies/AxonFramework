@@ -43,7 +43,7 @@ public class DefaultEventBusSpanFactory implements EventBusSpanFactory {
     }
 
     @Override
-    public Span createPublishEventSpan(EventMessage<?> eventMessage) {
+    public Span createPublishEventSpan(EventMessage eventMessage) {
         return spanFactory.createDispatchSpan(() -> "EventBus.publishEvent", eventMessage);
     }
 
@@ -53,7 +53,7 @@ public class DefaultEventBusSpanFactory implements EventBusSpanFactory {
     }
 
     @Override
-    public <T> EventMessage<T> propagateContext(EventMessage<T> eventMessage) {
+    public <T> EventMessage propagateContext(EventMessage eventMessage) {
         return spanFactory.propagateContext(eventMessage);
     }
 

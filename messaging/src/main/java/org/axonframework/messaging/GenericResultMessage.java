@@ -36,7 +36,7 @@ import java.util.Optional;
  * @author Steven van Beelen
  * @since 4.0.0
  */
-public class GenericResultMessage<R> extends MessageDecorator<R> implements ResultMessage<R> {
+public class GenericResultMessage extends MessageDecorator implements ResultMessage {
 
     private final Throwable exception;
 
@@ -49,7 +49,7 @@ public class GenericResultMessage<R> extends MessageDecorator<R> implements Resu
      * @param result The result of type {@code R} for this {@link ResultMessage}.
      */
     public GenericResultMessage(@Nonnull MessageType type,
-                                @Nullable R result) {
+                                @Nullable Object result) {
         this(type, result, MetaData.emptyInstance());
     }
 
@@ -75,9 +75,9 @@ public class GenericResultMessage<R> extends MessageDecorator<R> implements Resu
      * @param metaData The metadata for this {@link ResultMessage}.
      */
     public GenericResultMessage(@Nonnull MessageType type,
-                                @Nullable R result,
+                                @Nullable Object result,
                                 @Nonnull Map<String, String> metaData) {
-        this(new GenericMessage<>(type, result, metaData));
+        this(new GenericMessage(type, result, metaData));
     }
 
     /**
@@ -91,7 +91,7 @@ public class GenericResultMessage<R> extends MessageDecorator<R> implements Resu
     public GenericResultMessage(@Nonnull MessageType type,
                                 @Nonnull Throwable exception,
                                 @Nonnull Map<String, String> metaData) {
-        this(new GenericMessage<>(type, null, metaData), exception);
+        this(new GenericMessage(type, null, metaData), exception);
     }
 
     /**
@@ -105,7 +105,7 @@ public class GenericResultMessage<R> extends MessageDecorator<R> implements Resu
      *                 {@link Message#identifier() identifier} and {@link Message#metaData() metadata} for the
      *                 {@link QueryResponseMessage} to reconstruct.
      */
-    public GenericResultMessage(@Nonnull Message<R> delegate) {
+    public GenericResultMessage(@Nonnull Message delegate) {
         this(delegate, GenericResultMessage.findExceptionResult(delegate));
     }
 
@@ -122,7 +122,7 @@ public class GenericResultMessage<R> extends MessageDecorator<R> implements Resu
      * @param exception The {@link Throwable} describing the error representing the response of this
      *                  {@link ResultMessage}.
      */
-    public GenericResultMessage(@Nonnull Message<R> delegate,
+    public GenericResultMessage(@Nonnull Message delegate,
                                 @Nullable Throwable exception) {
         super(delegate);
         this.exception = exception;
@@ -142,17 +142,17 @@ public class GenericResultMessage<R> extends MessageDecorator<R> implements Resu
      * {@link MessageType type}.
      */
     @Deprecated
-    public static <R> ResultMessage<R> asResultMessage(Object result) {
+    public static <R> ResultMessage asResultMessage(Object result) {
         if (result instanceof ResultMessage) {
             //noinspection unchecked
-            return (ResultMessage<R>) result;
-        } else if (result instanceof Message<?> resultMessage) {
+            return (ResultMessage) result;
+        } else if (result instanceof Message resultMessage) {
             //noinspection unchecked
-            return (ResultMessage<R>) new GenericResultMessage<>(resultMessage);
+            return (ResultMessage) new GenericResultMessage(resultMessage);
         }
         MessageType type = result == null ? new MessageType("empty.result") : new MessageType(result.getClass());
         //noinspection unchecked
-        return new GenericResultMessage<>(type, (R) result);
+        return new GenericResultMessage(type, (R) result);
     }
 
     /**
@@ -165,13 +165,13 @@ public class GenericResultMessage<R> extends MessageDecorator<R> implements Resu
      * {@link MessageType type}.
      */
     @Deprecated
-    public static <R> ResultMessage<R> asResultMessage(Throwable exception) {
-        return new GenericResultMessage<>(new MessageType(exception.getClass()), exception);
+    public static <R> ResultMessage asResultMessage(Throwable exception) {
+        return new GenericResultMessage(new MessageType(exception.getClass()), exception);
     }
 
-    private static <R> Throwable findExceptionResult(Message<R> delegate) {
-        if (delegate instanceof ResultMessage && ((ResultMessage<R>) delegate).isExceptional()) {
-            return ((ResultMessage<R>) delegate).exceptionResult();
+    private static <R> Throwable findExceptionResult(Message delegate) {
+        if (delegate instanceof ResultMessage && ((ResultMessage) delegate).isExceptional()) {
+            return ((ResultMessage) delegate).exceptionResult();
         }
         return null;
     }
@@ -196,32 +196,32 @@ public class GenericResultMessage<R> extends MessageDecorator<R> implements Resu
 
     @Override
     @Nonnull
-    public ResultMessage<R> withMetaData(@Nonnull Map<String, String> metaData) {
-        return new GenericResultMessage<>(delegate().withMetaData(metaData), exception);
+    public ResultMessage withMetaData(@Nonnull Map<String, String> metaData) {
+        return new GenericResultMessage(delegate().withMetaData(metaData), exception);
     }
 
     @Override
     @Nonnull
-    public ResultMessage<R> andMetaData(@Nonnull Map<String, String> metaData) {
-        return new GenericResultMessage<>(delegate().andMetaData(metaData), exception);
+    public ResultMessage andMetaData(@Nonnull Map<String, String> metaData) {
+        return new GenericResultMessage(delegate().andMetaData(metaData), exception);
     }
 
     @Override
     @Nonnull
-    public <T> ResultMessage<T> withConvertedPayload(@Nonnull Type type, @Nonnull Converter converter) {
+    public <T> ResultMessage withConvertedPayload(@Nonnull Type type, @Nonnull Converter converter) {
         T convertedPayload = payloadAs(type, converter);
         if (ObjectUtils.nullSafeTypeOf(convertedPayload).isAssignableFrom(payloadType())) {
             //noinspection unchecked
-            return (ResultMessage<T>) this;
+            return (ResultMessage) this;
         }
-        Message<R> delegate = delegate();
-        Message<T> converted = new GenericMessage<>(delegate.identifier(),
+        Message delegate = delegate();
+        Message converted = new GenericMessage(delegate.identifier(),
                                                     delegate.type(),
                                                     convertedPayload,
                                                     delegate.metaData());
         return optionalExceptionResult().isPresent()
-                ? new GenericResultMessage<>(converted, optionalExceptionResult().get())
-                : new GenericResultMessage<>(converted);
+                ? new GenericResultMessage(converted, optionalExceptionResult().get())
+                : new GenericResultMessage(converted);
     }
 
     @Override
@@ -246,7 +246,7 @@ public class GenericResultMessage<R> extends MessageDecorator<R> implements Resu
     }
 
     @Override
-    public R payload() {
+    public Object payload() {
         if (isExceptional()) {
             throw new IllegalPayloadAccessException(
                     "This result completed exceptionally, payload is not available. "

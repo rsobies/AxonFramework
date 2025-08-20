@@ -147,7 +147,7 @@ public class AggregateConfigurerTest {
 
     @Test
     void aggregateConfigurationCreatesRevisionSnapshotFilterForAggregateWithRevision() {
-        DomainEventMessage<TestAggregateWithRevision> snapshotEvent = new GenericDomainEventMessage<>(
+        DomainEventMessage snapshotEvent = new GenericDomainEventMessage(
                 TestAggregateWithRevision.class.getName(), "some-aggregate-id", 0,
                 new MessageType("snapshot"), new TestAggregateWithRevision()
         );
@@ -330,7 +330,7 @@ public class AggregateConfigurerTest {
 
     @Test
     void nullRevisionEventAndNullRevisionAggregateAllowed() {
-        DomainEventMessage<TestAggregate> snapshotEvent = new GenericDomainEventMessage<>(
+        DomainEventMessage snapshotEvent = new GenericDomainEventMessage(
                 TestAggregate.class.getSimpleName(), "some-aggregate-id", 0,
                 new MessageType("snapshot"), new TestAggregate()
         );
@@ -350,7 +350,7 @@ public class AggregateConfigurerTest {
 
     @Test
     void nonNullEventRevisionAndNullAggregateRevisionNotAllowed() {
-        DomainEventMessage<TestAggregate> snapshotEvent = new GenericDomainEventMessage<>(
+        DomainEventMessage snapshotEvent = new GenericDomainEventMessage(
                 TestAggregate.class.getSimpleName(), "some-aggregate-id", 0,
                 new MessageType("snapshot"), new TestAggregate()
         );

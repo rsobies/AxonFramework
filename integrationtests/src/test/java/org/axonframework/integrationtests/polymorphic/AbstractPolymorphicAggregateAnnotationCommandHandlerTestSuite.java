@@ -230,7 +230,7 @@ public abstract class AbstractPolymorphicAggregateAnnotationCommandHandlerTestSu
     }
 
     private void assertAggregateState(String aggregateId, String expectedState) {
-        LegacyDefaultUnitOfWork<Message<?>> uow = LegacyDefaultUnitOfWork.startAndGet(null);
+        LegacyDefaultUnitOfWork<Message> uow = LegacyDefaultUnitOfWork.startAndGet(null);
         uow.attachTransaction(transactionManager);
         String state = uow.executeWithResult((ctx) -> {
             AtomicReference<String> rv = new AtomicReference<>();

@@ -42,7 +42,7 @@ import static org.mockito.Mockito.*;
  *
  * @author Rene de Waele
  */
-class GenericMessageTest extends MessageTestSuite<Message<?>> {
+class GenericMessageTest extends MessageTestSuite<Message> {
 
     private final Map<String, String> correlationData = MetaData.from(Collections.singletonMap("foo", "bar"));
 
@@ -56,13 +56,13 @@ class GenericMessageTest extends MessageTestSuite<Message<?>> {
     }
 
     @Override
-    protected Message<?> buildDefaultMessage() {
-        return new GenericMessage<>(TEST_IDENTIFIER, TEST_TYPE, TEST_PAYLOAD, TEST_PAYLOAD_TYPE, TEST_META_DATA);
+    protected Message buildDefaultMessage() {
+        return new GenericMessage(TEST_IDENTIFIER, TEST_TYPE, TEST_PAYLOAD, TEST_PAYLOAD_TYPE, TEST_META_DATA);
     }
 
     @Override
-    protected <P> Message<?> buildMessage(@Nullable P payload) {
-        return new GenericMessage<>(new MessageType(ObjectUtils.nullSafeTypeOf(payload)), payload);
+    protected <P> Message buildMessage(@Nullable P payload) {
+        return new GenericMessage(new MessageType(ObjectUtils.nullSafeTypeOf(payload)), payload);
     }
 
     @AfterEach
@@ -74,12 +74,12 @@ class GenericMessageTest extends MessageTestSuite<Message<?>> {
 
     @Test
     void correlationDataAddedToNewMessage() {
-        Message<Object> testMessage = new GenericMessage<>(new MessageType("message"), new Object());
+        Message testMessage = new GenericMessage(new MessageType("message"), new Object());
         assertEquals(correlationData, new HashMap<>(testMessage.metaData()));
 
         MetaData newMetaData = MetaData.from(Collections.singletonMap("what", "ever"));
-        Message<Object> testMessageWithMetaData =
-                new GenericMessage<>(new MessageType("message"), new Object(), newMetaData);
+        Message testMessageWithMetaData =
+                new GenericMessage(new MessageType("message"), new Object(), newMetaData);
         assertEquals(newMetaData.mergedWith(correlationData), testMessageWithMetaData.metaData());
     }
 
@@ -87,8 +87,8 @@ class GenericMessageTest extends MessageTestSuite<Message<?>> {
     void messageSerialization() throws IOException {
         Map<String, String> metaDataMap = Collections.singletonMap("key", "value");
 
-        Message<String> message =
-                new GenericMessage<>(new MessageType("message"), "payload", metaDataMap);
+        Message message =
+                new GenericMessage(new MessageType("message"), "payload", metaDataMap);
 
         JacksonSerializer jacksonSerializer = JacksonSerializer.builder().build();
 
@@ -108,13 +108,13 @@ class GenericMessageTest extends MessageTestSuite<Message<?>> {
     @Test
     void whenCorrelationDataProviderThrowsException_thenCatchException() {
         unitOfWork = new LegacyDefaultUnitOfWork<>(
-                new GenericEventMessage<>(new MessageType("event"), "Input 1")
+                new GenericEventMessage(new MessageType("event"), "Input 1")
         );
         CurrentUnitOfWork.set(unitOfWork);
         unitOfWork.registerCorrelationDataProvider(new ThrowingCorrelationDataProvider());
         ConversionException exception = new ConversionException("foo");
 
-        Message<?> result = new GenericMessage<>(new MessageType("exception"), exception);
+        Message result = new GenericMessage(new MessageType("exception"), exception);
 
         assertNotNull(result);
     }

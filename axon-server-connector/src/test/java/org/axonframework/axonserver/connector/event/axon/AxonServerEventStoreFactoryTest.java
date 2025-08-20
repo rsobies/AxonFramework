@@ -54,7 +54,7 @@ class AxonServerEventStoreFactoryTest {
     private Serializer eventSerializer;
     private SnapshotFilter snapshotFilter;
     private EventUpcaster upcasterChain;
-    private MessageMonitor<? super EventMessage<?>> messageMonitor;
+    private MessageMonitor<? super EventMessage> messageMonitor;
     private EventBusSpanFactory spanFactory;
 
     private AxonServerEventStoreFactory testSubject;
@@ -119,7 +119,7 @@ class AxonServerEventStoreFactoryTest {
                 getFieldValue(AbstractLegacyEventStorageEngine.class.getDeclaredField("snapshotFilter"), storageEngine);
         assertEquals(snapshotFilter, resultSnapshotFilter);
 
-        MessageMonitor<? super EventMessage<?>> resultMessageMonitor =
+        MessageMonitor<? super EventMessage> resultMessageMonitor =
                 getFieldValue(AbstractEventBus.class.getDeclaredField("messageMonitor"), result);
         assertEquals(messageMonitor, resultMessageMonitor);
         EventBusSpanFactory resultSpanFactory = getFieldValue(AbstractEventBus.class.getDeclaredField("spanFactory"),

@@ -217,7 +217,7 @@ public class AggregateBasedJpaEventStorageEngine implements EventStorageEngine {
               .forEach(entityManager::persist);
     }
 
-    private static DomainEventMessage<?> toDomainEventMessage(
+    private static DomainEventMessage toDomainEventMessage(
             TaggedEventMessage<?> taggedEvent,
             AggregateSequencer aggregateSequencer
     ) {
@@ -228,7 +228,7 @@ public class AggregateBasedJpaEventStorageEngine implements EventStorageEngine {
                 aggregateIdentifier != null && aggregateType != null && !taggedEvent.tags().isEmpty();
         if (isAggregateEvent) {
             var nextSequence = aggregateSequencer.incrementAndGetSequenceOf(aggregateIdentifier);
-            return new GenericDomainEventMessage<>(
+            return new GenericDomainEventMessage(
                     aggregateType,
                     aggregateIdentifier,
                     nextSequence,
@@ -240,7 +240,7 @@ public class AggregateBasedJpaEventStorageEngine implements EventStorageEngine {
             );
         } else {
             // returns non-aggregate event, so the sequence is always 0
-            return new GenericDomainEventMessage<>(null,
+            return new GenericDomainEventMessage(null,
                                                    event.identifier(),
                                                    0L,
                                                    event,
@@ -248,8 +248,8 @@ public class AggregateBasedJpaEventStorageEngine implements EventStorageEngine {
         }
     }
 
-    private DomainEventMessage<?> convertToDomainEventMessage(DomainEventData<?> event) {
-        return new GenericDomainEventMessage<>(
+    private DomainEventMessage convertToDomainEventMessage(DomainEventData<?> event) {
+        return new GenericDomainEventMessage(
                 event.getType(),
                 event.getAggregateIdentifier(),
                 event.getSequenceNumber(),
@@ -258,7 +258,7 @@ public class AggregateBasedJpaEventStorageEngine implements EventStorageEngine {
         );
     }
 
-    private GenericEventMessage<?> convertToEventMessage(EventData<?> event) {
+    private GenericEventMessage convertToEventMessage(EventData<?> event) {
         var payload = event.getPayload();
         var revision = payload.getType().getRevision();
         var payloadClass = eventSerializer.classForType(payload.getType());
@@ -267,7 +267,7 @@ public class AggregateBasedJpaEventStorageEngine implements EventStorageEngine {
                 : new MessageType(payloadClass, revision);
         var metadata = event.getMetaData();
         MetaData metaData = eventSerializer.convert(metadata.getData(), MetaData.class);
-        return new GenericEventMessage<>(
+        return new GenericEventMessage(
                 event.getEventIdentifier(),
                 messageType,
                 payload.getData(),
@@ -277,7 +277,7 @@ public class AggregateBasedJpaEventStorageEngine implements EventStorageEngine {
     }
 
     @Override
-    public MessageStream<EventMessage<?>> source(@Nonnull SourcingCondition condition) {
+    public MessageStream<EventMessage> source(@Nonnull SourcingCondition condition) {
         CompletableFuture<Void> endOfStreams = new CompletableFuture<>();
         List<AggregateSource> aggregateSources = condition.criteria()
                                                           .flatten()
@@ -305,7 +305,7 @@ public class AggregateBasedJpaEventStorageEngine implements EventStorageEngine {
         var aggregateIdentifier = resolveAggregateIdentifier(criterion.tags());
         var events = batchingOperations.readEventData(aggregateIdentifier, condition.start());
 
-        MessageStream<EventMessage<?>> source =
+        MessageStream<EventMessage> source =
                 MessageStream.fromStream(events,
                                          this::convertToDomainEventMessage,
                                          event -> setMarkerAndBuildContext(event.getAggregateIdentifier(),
@@ -337,7 +337,7 @@ public class AggregateBasedJpaEventStorageEngine implements EventStorageEngine {
     }
 
     @Override
-    public MessageStream<EventMessage<?>> stream(@Nonnull StreamingCondition condition) {
+    public MessageStream<EventMessage> stream(@Nonnull StreamingCondition condition) {
         var trackingToken = tokenOperations.assertGapAwareTrackingToken(condition.position());
         var events = batchingOperations.readEventData(trackingToken);
         return MessageStream.fromStream(
@@ -347,13 +347,13 @@ public class AggregateBasedJpaEventStorageEngine implements EventStorageEngine {
         );
     }
 
-    private TrackedEventMessage<?> convertToTrackedEventMessage(TrackedEventData<?> event) {
+    private TrackedEventMessage convertToTrackedEventMessage(TrackedEventData<?> event) {
         var trackingToken = event.trackingToken();
         if (event instanceof TrackedDomainEventData<?> trackedDomainEventData) {
             var domainEventMessage = convertToDomainEventMessage(trackedDomainEventData);
-            return new GenericTrackedDomainEventMessage<>(trackingToken, domainEventMessage);
+            return new GenericTrackedDomainEventMessage(trackingToken, domainEventMessage);
         }
-        return new GenericTrackedEventMessage<>(trackingToken, convertToEventMessage(event));
+        return new GenericTrackedEventMessage(trackingToken, convertToEventMessage(event));
     }
 
     private static Context trackedEventContext(TrackedEventData<?> trackedEventData) {
@@ -563,7 +563,7 @@ public class AggregateBasedJpaEventStorageEngine implements EventStorageEngine {
      */
     private record AggregateSource(
             AtomicReference<AggregateBasedConsistencyMarker> markerReference,
-            MessageStream<EventMessage<?>> source
+            MessageStream<EventMessage> source
     ) {
 
     }

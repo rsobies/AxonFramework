@@ -47,14 +47,14 @@ import java.util.Map;
  * @see org.axonframework.queryhandling.QueryMessage
  * @since 2.0.0
  */
-public interface Message<P> {
+public interface Message {
 
     /**
      * The {@link Context.ResourceKey} used to store and retrieve the {@link Message} from the
      * {@link ProcessingContext}. Should always be the message for which a handler is being called. For example, if an
      * event handler is called within the context of a command, the message should be the event message.
      */
-    Context.ResourceKey<Message<?>> RESOURCE_KEY = Context.ResourceKey.withLabel("Message");
+    Context.ResourceKey<Message> RESOURCE_KEY = Context.ResourceKey.withLabel("Message");
 
     /**
      * Adds the given {@code message} to the given {@code context} under the {@link #RESOURCE_KEY}. This allows
@@ -68,7 +68,7 @@ public interface Message<P> {
      * @return The updated {@link ProcessingContext} with the {@code message} added under the {@link #RESOURCE_KEY}.
      */
     @Nonnull
-    static ProcessingContext addToContext(@Nonnull ProcessingContext context, @Nonnull Message<?> message) {
+    static ProcessingContext addToContext(@Nonnull ProcessingContext context, @Nonnull Message message) {
         return context.withResource(RESOURCE_KEY, message);
     }
 
@@ -80,7 +80,7 @@ public interface Message<P> {
      * found.
      */
     @Nullable
-    static Message<?> fromContext(@Nonnull ProcessingContext context) {
+    static Message fromContext(@Nonnull ProcessingContext context) {
         return context.getResource(RESOURCE_KEY);
     }
 
@@ -112,7 +112,7 @@ public interface Message<P> {
      * @return The payload of this {@code Message} of generic type {@code P}.
      */
     @Nullable
-    P payload();
+    Object payload();
 
     /**
      * Returns the payload of this {@code Message}, converted to the given {@code type} by the given {@code converter}.
@@ -188,7 +188,7 @@ public interface Message<P> {
      * @return The type of payload.
      */
     @Nonnull
-    Class<P> payloadType();
+    Class<?> payloadType();
 
     /**
      * Returns the {@link MetaData} for this {@code Message}.
@@ -213,7 +213,7 @@ public interface Message<P> {
      * @return A copy of {@code this Message (implementation)} with the given {@code metaData}.
      */
     @Nonnull
-    Message<P> withMetaData(@Nonnull Map<String, String> metaData);
+    Message withMetaData(@Nonnull Map<String, String> metaData);
 
     /**
      * Returns a copy of this {@code Message} (implementation) with its {@link Message#metaData() metadata} merged with
@@ -225,7 +225,7 @@ public interface Message<P> {
      * @return A copy of {@code this Message (implementation)} with the given {@code metaData}.
      */
     @Nonnull
-    Message<P> andMetaData(@Nonnull Map<String, String> metaData);
+    Message andMetaData(@Nonnull Map<String, String> metaData);
 
     /**
      * Serialize the payload of this message to the {@code expectedRepresentation} using given {@code serializer}. This
@@ -278,7 +278,7 @@ public interface Message<P> {
      *                             {@code converter} is given.
      */
     @Nonnull
-    default <T> Message<T> withConvertedPayload(@Nonnull Class<T> type, @Nonnull Converter converter) {
+    default Message withConvertedPayload(@Nonnull Class<?> type, @Nonnull Converter converter) {
         return withConvertedPayload((Type) type, converter);
     }
 
@@ -299,7 +299,7 @@ public interface Message<P> {
      *                             {@code converter} is given.
      */
     @Nonnull
-    default <T> Message<T> withConvertedPayload(@Nonnull TypeReference<T> type, @Nonnull Converter converter) {
+    default Message withConvertedPayload(@Nonnull TypeReference<?> type, @Nonnull Converter converter) {
         return withConvertedPayload(type.getType(), converter);
     }
 
@@ -320,5 +320,5 @@ public interface Message<P> {
      *                             {@code converter} is given.
      */
     @Nonnull
-    <T> Message<T> withConvertedPayload(@Nonnull Type type, @Nonnull Converter converter);
+    <T> Message withConvertedPayload(@Nonnull Type type, @Nonnull Converter converter);
 }

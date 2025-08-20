@@ -53,7 +53,7 @@ class DomainEventEntryTest {
         Instant expectedTimestamp = DateTimeUtils.parseInstant(DateTimeUtils.formatInstant(testTimestamp));
         String expectedEventIdentifier = randomUUID().toString();
 
-        DomainEventMessage<String> testEvent = new GenericDomainEventMessage<>(
+        DomainEventMessage testEvent = new GenericDomainEventMessage(
                 expectedAggregateType, expectedAggregateId, expectedSequenceNumber,
                 expectedEventIdentifier, expectedType,
                 expectedPayload, expectedMetaData, testTimestamp

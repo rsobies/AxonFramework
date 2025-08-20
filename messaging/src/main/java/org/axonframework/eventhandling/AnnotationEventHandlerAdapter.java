@@ -135,7 +135,7 @@ public class AnnotationEventHandlerAdapter implements EventMessageHandler {
     }
 
     @Override
-    public Object handleSync(@Nonnull EventMessage<?> event, @Nonnull ProcessingContext context) throws Exception {
+    public Object handleSync(@Nonnull EventMessage event, @Nonnull ProcessingContext context) throws Exception {
         Optional<MessageHandlingMember<? super Object>> handler =
                 inspector.getHandlers(listenerType)
                          .filter(h -> h.canHandle(event, context))
@@ -148,7 +148,7 @@ public class AnnotationEventHandlerAdapter implements EventMessageHandler {
     }
 
     @Override
-    public boolean canHandle(@Nonnull EventMessage<?> event, @Nonnull ProcessingContext context) {
+    public boolean canHandle(@Nonnull EventMessage event, @Nonnull ProcessingContext context) {
         return inspector.getHandlers(listenerType)
                         .anyMatch(h -> h.canHandle(event, context));
     }
@@ -205,7 +205,7 @@ public class AnnotationEventHandlerAdapter implements EventMessageHandler {
         if (messageOrPayload instanceof ResetContext) {
             return (ResetContext<T>) messageOrPayload;
         } else if (messageOrPayload instanceof Message) {
-            return new GenericResetContext<>((Message<T>) messageOrPayload);
+            return new GenericResetContext<>((Message) messageOrPayload);
         }
         MessageType type = messageOrPayload == null
                 ? new MessageType("empty.reset.context")

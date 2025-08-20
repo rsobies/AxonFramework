@@ -47,14 +47,14 @@ class EventPublishingUtils {
      * @return The event as an {@link EventMessage}.
      */
     @SuppressWarnings("unchecked")
-    static <E> EventMessage<E> asEventMessage(@Nonnull Object event, MessageTypeResolver messageTypeResolver) {
-        if (event instanceof EventMessage<?>) {
-            return (EventMessage<E>) event;
-        } else if (event instanceof Message<?>) {
-            Message<E> message = (Message<E>) event;
-            return new GenericEventMessage<>(message, () -> GenericEventMessage.clock.instant());
+    static <E> EventMessage asEventMessage(@Nonnull Object event, MessageTypeResolver messageTypeResolver) {
+        if (event instanceof EventMessage) {
+            return (EventMessage) event;
+        } else if (event instanceof Message) {
+            Message message = (Message) event;
+            return new GenericEventMessage(message, () -> GenericEventMessage.clock.instant());
         }
-        return new GenericEventMessage<>(
+        return new GenericEventMessage(
                 messageTypeResolver.resolveOrThrow(event),
                 (E) event,
                 MetaData.emptyInstance()

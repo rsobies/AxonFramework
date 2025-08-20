@@ -154,12 +154,12 @@ public class AxonServerEventStore extends AbstractLegacyEventStore {
      * @param context the name of the context to create a message source for
      * @return a {@link StreamableMessageSource} of {@link TrackedEventMessage}s tied to the given {@code context}
      */
-    public StreamableMessageSource<TrackedEventMessage<?>> createStreamableMessageSourceForContext(String context) {
+    public StreamableMessageSource<TrackedEventMessage> createStreamableMessageSourceForContext(String context) {
         return new AxonServerMessageSource(storageEngine().createInstanceForContext(context));
     }
 
     @Override
-    protected Optional<DomainEventMessage<?>> handleSnapshotReadingError(String aggregateIdentifier, Throwable e) {
+    protected Optional<DomainEventMessage> handleSnapshotReadingError(String aggregateIdentifier, Throwable e) {
         if (Status.fromThrowable(e).getCode() != Status.Code.UNKNOWN) {
             throw new EventStoreException("Error occurred while communicating with Axon Server", e);
         }
@@ -206,7 +206,7 @@ public class AxonServerEventStore extends AbstractLegacyEventStore {
         }
 
         @Override
-        public Builder messageMonitor(@Nonnull MessageMonitor<? super EventMessage<?>> messageMonitor) {
+        public Builder messageMonitor(@Nonnull MessageMonitor<? super EventMessage> messageMonitor) {
             super.messageMonitor(messageMonitor);
             return this;
         }
@@ -426,7 +426,7 @@ public class AxonServerEventStore extends AbstractLegacyEventStore {
         }
 
         @Override
-        protected void appendEvents(List<? extends EventMessage<?>> events, Serializer serializer) {
+        protected void appendEvents(List<? extends EventMessage> events, Serializer serializer) {
             AppendEventsTransaction sender;
             if (CurrentUnitOfWork.isStarted()) {
                 sender = CurrentUnitOfWork.get().root().getOrComputeResource(APPEND_EVENT_TRANSACTION, k -> {
@@ -441,7 +441,7 @@ public class AxonServerEventStore extends AbstractLegacyEventStore {
             } else {
                 sender = connectionManager.getConnection(context).eventChannel().startAppendEventsTransaction();
             }
-            for (EventMessage<?> eventMessage : events) {
+            for (EventMessage eventMessage : events) {
                 sender.appendEvent(map(eventMessage, serializer));
             }
             if (!CurrentUnitOfWork.isStarted()) {
@@ -465,12 +465,12 @@ public class AxonServerEventStore extends AbstractLegacyEventStore {
             }
         }
 
-        public Event map(EventMessage<?> eventMessage, Serializer serializer) {
+        public Event map(EventMessage eventMessage, Serializer serializer) {
             Event.Builder builder = Event.newBuilder();
             if (eventMessage instanceof GenericDomainEventMessage) {
-                builder.setAggregateIdentifier(((GenericDomainEventMessage<?>) eventMessage).getAggregateIdentifier())
-                       .setAggregateSequenceNumber(((GenericDomainEventMessage<?>) eventMessage).getSequenceNumber())
-                       .setAggregateType(((GenericDomainEventMessage<?>) eventMessage).getType());
+                builder.setAggregateIdentifier(((GenericDomainEventMessage) eventMessage).getAggregateIdentifier())
+                       .setAggregateSequenceNumber(((GenericDomainEventMessage) eventMessage).getSequenceNumber())
+                       .setAggregateType(((GenericDomainEventMessage) eventMessage).getType());
             }
             SerializedObject<byte[]> serializedPayload = eventMessage.serializePayload(serializer, byte[].class);
             builder.setMessageIdentifier(eventMessage.identifier()).setPayload(
@@ -488,7 +488,7 @@ public class AxonServerEventStore extends AbstractLegacyEventStore {
 
 
         @Override
-        protected void storeSnapshot(DomainEventMessage<?> snapshot, Serializer serializer) {
+        protected void storeSnapshot(DomainEventMessage snapshot, Serializer serializer) {
             connectionManager.getConnection(context)
                              .eventChannel()
                              .appendSnapshot(map(snapshot, serializer))
@@ -771,7 +771,7 @@ public class AxonServerEventStore extends AbstractLegacyEventStore {
      * TrackedEventMessage}, delegating the calls towards the provided storage engine. Can be leveraged to create new
      * StreamableMessageSources, each delegating towards a storage engine within a different Bounded Context.
      */
-    private static class AxonServerMessageSource implements StreamableMessageSource<TrackedEventMessage<?>> {
+    private static class AxonServerMessageSource implements StreamableMessageSource<TrackedEventMessage> {
 
         private final AxonIQEventStorageEngine eventStorageEngine;
 
@@ -780,7 +780,7 @@ public class AxonServerEventStore extends AbstractLegacyEventStore {
         }
 
         @Override
-        public BlockingStream<TrackedEventMessage<?>> openStream(TrackingToken trackingToken) {
+        public BlockingStream<TrackedEventMessage> openStream(TrackingToken trackingToken) {
             return eventStorageEngine.openStream(trackingToken);
         }
 

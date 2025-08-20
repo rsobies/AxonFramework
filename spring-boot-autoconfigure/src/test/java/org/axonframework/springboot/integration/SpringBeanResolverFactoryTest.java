@@ -70,7 +70,7 @@ import static org.mockito.Mockito.*;
 class SpringBeanResolverFactoryTest {
 
     private static final AtomicInteger COUNTER = new AtomicInteger();
-    private static final EventMessage<Object> EVENT_MESSAGE = asEventMessage("Hi there");
+    private static final EventMessage EVENT_MESSAGE = asEventMessage("Hi there");
     private final MessageTypeResolver messageTypeResolver = new ClassBasedMessageTypeResolver();
 
     private ProcessingContext processingContext;
@@ -121,7 +121,7 @@ class SpringBeanResolverFactoryTest {
 
             // Generates a FixtureExecutionException due to the inclusion of axon-test,
             //  which includes the FixtureResourceParameterResolverFactory
-            CompletableFuture<Message<Void>> result =
+            CompletableFuture<Message> result =
                     new AnnotationEventHandlerAdapter(bean, parameterResolver, messageTypeResolver)
                             .handle(EVENT_MESSAGE, processingContext)
                             .first()
@@ -158,7 +158,7 @@ class SpringBeanResolverFactoryTest {
 
             // Generates a FixtureExecutionException due to the inclusion of axon-test,
             //  which includes the FixtureResourceParameterResolverFactory
-            CompletableFuture<Message<Void>> result =
+            CompletableFuture<Message> result =
                     new AnnotationEventHandlerAdapter(bean, parameterResolver, messageTypeResolver)
                             .handle(EVENT_MESSAGE, processingContext)
                             .first()
@@ -225,7 +225,7 @@ class SpringBeanResolverFactoryTest {
                                                                                       messageTypeResolver);
 
             // Spring dependency resolution will resolve at time of execution
-            CompletableFuture<Message<Void>> result = adapter.handle(EVENT_MESSAGE, processingContext)
+            CompletableFuture<Message> result = adapter.handle(EVENT_MESSAGE, processingContext)
                                                              .first()
                                                              .asCompletableFuture()
                                                              .thenApply(Entry::message);
@@ -263,8 +263,8 @@ class SpringBeanResolverFactoryTest {
         });
     }
 
-    private static EventMessage<Object> asEventMessage(Object payload) {
-        return new GenericEventMessage<>(new MessageType("event"), payload);
+    private static EventMessage asEventMessage(Object payload) {
+        return new GenericEventMessage(new MessageType("event"), payload);
     }
 
     public interface DuplicateResourceWithPrimary {

@@ -65,8 +65,8 @@ public final class EventProcessorOperations {
     private final String name;
     private final EventHandlingComponent eventHandlingComponent;
     private final ErrorHandler errorHandler;
-    private final MessageMonitor<? super EventMessage<?>> messageMonitor;
-    private final List<MessageHandlerInterceptor<? super EventMessage<?>>> interceptors = new CopyOnWriteArrayList<>();
+    private final MessageMonitor<? super EventMessage> messageMonitor;
+    private final List<MessageHandlerInterceptor<? super EventMessage>> interceptors = new CopyOnWriteArrayList<>();
     private final EventProcessorSpanFactory spanFactory;
     private final boolean streamingProcessor;
     private final SegmentMatcher segmentMatcher;
@@ -102,7 +102,7 @@ public final class EventProcessorOperations {
     }
 
     public Registration registerHandlerInterceptor(
-            @Nonnull MessageHandlerInterceptor<? super EventMessage<?>> interceptor) {
+            @Nonnull MessageHandlerInterceptor<? super EventMessage> interceptor) {
         interceptors.add(interceptor);
         return () -> interceptors.remove(interceptor);
     }
@@ -113,7 +113,7 @@ public final class EventProcessorOperations {
      *
      * @return The list of registered interceptors of the event processor.
      */
-    public List<MessageHandlerInterceptor<? super EventMessage<?>>> handlerInterceptors() {
+    public List<MessageHandlerInterceptor<? super EventMessage>> handlerInterceptors() {
         return Collections.unmodifiableList(interceptors);
     }
 
@@ -132,7 +132,7 @@ public final class EventProcessorOperations {
      * @throws Exception if the {@code errorHandler} throws an Exception back on the
      *                   {@link ErrorHandler#handleError(ErrorContext)} call
      */
-    public boolean canHandle(EventMessage<?> eventMessage, @Nonnull ProcessingContext context, Segment segment)
+    public boolean canHandle(EventMessage eventMessage, @Nonnull ProcessingContext context, Segment segment)
             throws Exception {
         try {
             var eventMessageQualifiedName = eventMessage.type().qualifiedName();
@@ -162,7 +162,7 @@ public final class EventProcessorOperations {
      * @param unitOfWork    The Unit of Work that has been prepared to process the messages
      * @throws Exception when an exception occurred during processing of the batch
      */
-    public void processInUnitOfWork(List<? extends EventMessage<?>> eventMessages,
+    public void processInUnitOfWork(List<? extends EventMessage> eventMessages,
                                              UnitOfWork unitOfWork) throws Exception {
         processInUnitOfWork(eventMessages, unitOfWork, ROOT_SEGMENT).join();
     }
@@ -177,13 +177,13 @@ public final class EventProcessorOperations {
      * @param processingSegments The segments for which the events should be processed in this unit of work
      * @throws Exception when an exception occurred during processing of the batch
      */
-    public CompletableFuture<Void> processInUnitOfWork(List<? extends EventMessage<?>> eventMessages,
+    public CompletableFuture<Void> processInUnitOfWork(List<? extends EventMessage> eventMessages,
                                                        UnitOfWork unitOfWork,
                                                        Collection<Segment> processingSegments) throws Exception {
         unitOfWork.onInvocation(processingContext -> {
             CompletableFuture<Void> result = CompletableFuture.completedFuture(null);
 
-            for (EventMessage<?> message : eventMessages) {
+            for (EventMessage message : eventMessages) {
                 result = result.thenCompose(v -> spanFactory
                         .createProcessEventSpan(streamingProcessor, message)
                         .runSupplierAsync(() -> processMessage(processingSegments, processingContext, message))
@@ -208,7 +208,7 @@ public final class EventProcessorOperations {
     }
 
     private MessageStream.Empty<?> processMessageInUnitOfWork(Collection<Segment> processingSegments,
-                                                              EventMessage<?> message,
+                                                              EventMessage message,
                                                               ProcessingContext processingContext,
                                                               MessageMonitor.MonitorCallback monitorCallback
     ) throws Exception {
@@ -230,12 +230,12 @@ public final class EventProcessorOperations {
 
     private CompletableFuture<Void> processMessage(Collection<Segment> processingSegments,
                                                    ProcessingContext processingContext,
-                                                   EventMessage<?> message
+                                                   EventMessage message
     ) {
         try {
             var monitorCallback = messageMonitor.onMessageIngested(message);
 
-            DefaultInterceptorChain<EventMessage<?>, ?> chain =
+            DefaultInterceptorChain<EventMessage, ?> chain =
                     new DefaultInterceptorChain<>(
                             null,
                             interceptors,
@@ -261,7 +261,7 @@ public final class EventProcessorOperations {
      *
      * @param eventMessage the message that has been ignored.
      */
-    public void reportIgnored(EventMessage<?> eventMessage) {
+    public void reportIgnored(EventMessage eventMessage) {
         messageMonitor.onMessageIngested(eventMessage).reportIgnored();
     }
 
@@ -278,7 +278,7 @@ public final class EventProcessorOperations {
         private String name;
         private EventHandlingComponent eventHandlingComponent;
         private ErrorHandler errorHandler = PropagatingErrorHandler.INSTANCE;
-        private MessageMonitor<? super EventMessage<?>> messageMonitor = NoOpMessageMonitor.INSTANCE;
+        private MessageMonitor<? super EventMessage> messageMonitor = NoOpMessageMonitor.INSTANCE;
         private EventProcessorSpanFactory spanFactory = DefaultEventProcessorSpanFactory.builder()
                                                                                         .spanFactory(NoOpSpanFactory.INSTANCE)
                                                                                         .build();
@@ -343,7 +343,7 @@ public final class EventProcessorOperations {
          *                       processed
          * @return the current Builder instance, for fluent interfacing
          */
-        public Builder messageMonitor(@Nonnull MessageMonitor<? super EventMessage<?>> messageMonitor) {
+        public Builder messageMonitor(@Nonnull MessageMonitor<? super EventMessage> messageMonitor) {
             assertNonNull(messageMonitor, "MessageMonitor may not be null");
             this.messageMonitor = messageMonitor;
             return this;

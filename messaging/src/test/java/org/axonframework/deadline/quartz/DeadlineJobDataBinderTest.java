@@ -56,7 +56,7 @@ class DeadlineJobDataBinderTest {
         DeadlineMessage<String> testDeadlineMessage =
                 new GenericDeadlineMessage<>(
                         TEST_DEADLINE_NAME,
-                        new GenericMessage<>(new MessageType(TEST_DEADLINE_PAYLOAD.getClass()), TEST_DEADLINE_PAYLOAD),
+                        new GenericMessage(new MessageType(TEST_DEADLINE_PAYLOAD.getClass()), TEST_DEADLINE_PAYLOAD),
                         Instant::now
                 );
         testMetaData = MetaData.with("some-key", "some-value");

@@ -144,7 +144,7 @@ public class AxonServerEventStoreFactory {
         private Serializer eventSerializer;
         private EventUpcaster upcasterChain = NoOpEventUpcaster.INSTANCE;
         private SnapshotFilter snapshotFilter;
-        private MessageMonitor<? super EventMessage<?>> messageMonitor = NoOpMessageMonitor.INSTANCE;
+        private MessageMonitor<? super EventMessage> messageMonitor = NoOpMessageMonitor.INSTANCE;
         private EventBusSpanFactory spanFactory = DefaultEventBusSpanFactory.builder()
                                                                             .spanFactory(NoOpSpanFactory.INSTANCE)
                                                                             .build();
@@ -260,7 +260,7 @@ public class AxonServerEventStoreFactory {
          * @param messageMonitor A {@link MessageMonitor} to monitor ingested {@link EventMessage EventMessages}.
          * @return The current Builder instance, for fluent interfacing.
          */
-        public Builder messageMonitor(@Nonnull MessageMonitor<? super EventMessage<?>> messageMonitor) {
+        public Builder messageMonitor(@Nonnull MessageMonitor<? super EventMessage> messageMonitor) {
             assertNonNull(messageMonitor, "MessageMonitor may not be null");
             this.messageMonitor = messageMonitor;
             return this;

@@ -312,7 +312,7 @@ class FixtureTest_Deadlines {
                                                            Object payload,
                                                            Instant expiryTime) {
         return new GenericDeadlineMessage<>(
-                deadlineName, new GenericMessage<>(new MessageType(payload.getClass()), (P) payload), () -> expiryTime
+                deadlineName, new GenericMessage(new MessageType(payload.getClass()), (P) payload), () -> expiryTime
         );
     }
 

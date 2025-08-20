@@ -180,7 +180,7 @@ public class JobRunrEventScheduler implements EventScheduler {
      */
     public void publish(String serializedPayload, String payloadClass) {
         logger.debug("Invoked by JobRunr to publish a scheduled event without metadata.");
-        EventMessage<?> eventMessage = createMessage(serializedPayload, payloadClass, null);
+        EventMessage eventMessage = createMessage(serializedPayload, payloadClass, null);
         publishEventMessage(eventMessage);
     }
 
@@ -194,7 +194,7 @@ public class JobRunrEventScheduler implements EventScheduler {
      */
     public void publish(String serializedPayload, String payloadClass, String serializedMetadata) {
         logger.debug("Invoked by JobRunr to publish a scheduled event with metadata");
-        EventMessage<?> eventMessage = createMessage(serializedPayload, payloadClass, null, serializedMetadata);
+        EventMessage eventMessage = createMessage(serializedPayload, payloadClass, null, serializedMetadata);
         publishEventMessage(eventMessage);
     }
 
@@ -208,7 +208,7 @@ public class JobRunrEventScheduler implements EventScheduler {
      */
     public void publishWithRevision(String serializedPayload, String payloadClass, String revision) {
         logger.debug("Invoked by JobRunr to publish a scheduled event without metadata.");
-        EventMessage<?> eventMessage = createMessage(serializedPayload, payloadClass, revision);
+        EventMessage eventMessage = createMessage(serializedPayload, payloadClass, revision);
         publishEventMessage(eventMessage);
     }
 
@@ -224,11 +224,11 @@ public class JobRunrEventScheduler implements EventScheduler {
     public void publishWithRevision(String serializedPayload, String payloadClass, String revision,
                                     String serializedMetadata) {
         logger.debug("Invoked by JobRunr to publish a scheduled event with metadata");
-        EventMessage<?> eventMessage = createMessage(serializedPayload, payloadClass, revision, serializedMetadata);
+        EventMessage eventMessage = createMessage(serializedPayload, payloadClass, revision, serializedMetadata);
         publishEventMessage(eventMessage);
     }
 
-    private EventMessage<?> createMessage(
+    private EventMessage createMessage(
             String serializedPayload,
             String payloadClass,
             String revision) {
@@ -240,26 +240,26 @@ public class JobRunrEventScheduler implements EventScheduler {
     }
 
     @SuppressWarnings("unchecked")
-    private <E> EventMessage<E> asEventMessage(@Nonnull Object event) {
-        if (event instanceof EventMessage<?>) {
-            return (EventMessage<E>) event;
-        } else if (event instanceof Message<?>) {
-            Message<E> message = (Message<E>) event;
-            return new GenericEventMessage<>(message, () -> GenericEventMessage.clock.instant());
+    private <E> EventMessage asEventMessage(@Nonnull Object event) {
+        if (event instanceof EventMessage) {
+            return (EventMessage) event;
+        } else if (event instanceof Message) {
+            Message message = (Message) event;
+            return new GenericEventMessage(message, () -> GenericEventMessage.clock.instant());
         }
-        return new GenericEventMessage<>(
+        return new GenericEventMessage(
                 messageTypeResolver.resolveOrThrow(event),
                 (E) event,
                 MetaData.emptyInstance()
         );
     }
 
-    private EventMessage<?> createMessage(
+    private EventMessage createMessage(
             String serializedPayload,
             String payloadClass,
             String revision,
             String serializedMetadata) {
-        EventMessage<?> eventMessage = createMessage(serializedPayload, payloadClass, revision);
+        EventMessage eventMessage = createMessage(serializedPayload, payloadClass, revision);
         SimpleSerializedObject<String> serializedMetaData = new SimpleSerializedObject<>(
                 serializedMetadata, String.class, MetaData.class.getName(), null
         );
@@ -268,7 +268,7 @@ public class JobRunrEventScheduler implements EventScheduler {
 
     @SuppressWarnings("rawtypes")
     private void publishEventMessage(EventMessage eventMessage) {
-        LegacyUnitOfWork<EventMessage<?>> unitOfWork = LegacyDefaultUnitOfWork.startAndGet(null);
+        LegacyUnitOfWork<EventMessage> unitOfWork = LegacyDefaultUnitOfWork.startAndGet(null);
         unitOfWork.attachTransaction(transactionManager);
         unitOfWork.execute((ctx) -> eventBus.publish(eventMessage));
     }

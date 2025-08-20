@@ -103,8 +103,8 @@ import static org.mockito.Mockito.*;
  */
 class DefaultConfigurerTest {
 
-    private static final GenericCommandMessage<String> TEST_COMMAND =
-            new GenericCommandMessage<>(new MessageType("command"), "test");
+    private static final GenericCommandMessage TEST_COMMAND =
+            new GenericCommandMessage(new MessageType("command"), "test");
 
     private EntityManagerFactory entityManagerFactory;
     private EntityManager entityManager;
@@ -274,8 +274,8 @@ class DefaultConfigurerTest {
 
         config.commandGateway()
               .sendAndWait(TEST_COMMAND);
-        CommandMessage<String> testCommand = new GenericCommandMessage<>(
-                new GenericMessage<>(new MessageType("update"), "test")
+        CommandMessage testCommand = new GenericCommandMessage(
+                new GenericMessage(new MessageType("update"), "test")
         );
         config.commandGateway().sendAndWait(testCommand);
         assertEquals(1, counter.get());
@@ -568,7 +568,7 @@ class DefaultConfigurerTest {
         Serializer serializer = TestSerializer.xStreamSerializer();
         EntityManagerTransactionManager transactionManager = spy(new EntityManagerTransactionManager(entityManager));
 
-        DomainEventMessage<String> testDomainEvent = new GenericDomainEventMessage<>(
+        DomainEventMessage testDomainEvent = new GenericDomainEventMessage(
                 "StubAggregate", "some-aggregate-id", 0, new MessageType("event"), "some-payload"
         );
         DomainEventData<byte[]> snapshotData =

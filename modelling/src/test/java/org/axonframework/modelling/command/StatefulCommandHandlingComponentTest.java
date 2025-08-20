@@ -55,7 +55,7 @@ class StatefulCommandHandlingComponentTest {
             return MessageStream.empty().cast();
         });
 
-        GenericCommandMessage<String> command = new GenericCommandMessage<>(new MessageType("test-command"),
+        GenericCommandMessage command = new GenericCommandMessage(new MessageType("test-command"),
                                                                             "my-payload");
         testSubject.handle(command, StubProcessingContext.forMessage(command)).asCompletableFuture().join();
         assertTrue(invoked.get());
@@ -70,7 +70,7 @@ class StatefulCommandHandlingComponentTest {
             return MessageStream.empty().cast();
         });
 
-        GenericCommandMessage<String> command = new GenericCommandMessage<>(new MessageType("test-command"),
+        GenericCommandMessage command = new GenericCommandMessage(new MessageType("test-command"),
                                                                             "my-payload");
         testSubject.handle(command, StubProcessingContext.forMessage(command))
                    .asCompletableFuture().join();
@@ -97,7 +97,7 @@ class StatefulCommandHandlingComponentTest {
         });
 
         CompletionException exception = assertThrows(CompletionException.class, () -> {
-            GenericCommandMessage<String> command = new GenericCommandMessage<>(new MessageType("test-command"),
+            GenericCommandMessage command = new GenericCommandMessage(new MessageType("test-command"),
                                                                                 "my-payload");
             testSubject.handle(command, StubProcessingContext.forMessage(command))
                        .asCompletableFuture()

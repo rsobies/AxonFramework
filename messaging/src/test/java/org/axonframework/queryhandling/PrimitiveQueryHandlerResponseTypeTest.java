@@ -90,10 +90,10 @@ class PrimitiveQueryHandlerResponseTypeTest {
      */
     private <T> void test(final T value, final Class<T> boxed, final Class<T> primitive) {
         MessageType type = new MessageType(value.getClass().getName());
-        final QueryMessage<T, T> queryBoxed = new GenericQueryMessage<>(
+        final QueryMessage queryBoxed = new GenericQueryMessage(
                 type, value, ResponseTypes.instanceOf(boxed)
         );
-        final QueryMessage<T, T> queryPrimitive = new GenericQueryMessage<>(
+        final QueryMessage queryPrimitive = new GenericQueryMessage(
                 type, value, ResponseTypes.instanceOf(primitive)
         );
 

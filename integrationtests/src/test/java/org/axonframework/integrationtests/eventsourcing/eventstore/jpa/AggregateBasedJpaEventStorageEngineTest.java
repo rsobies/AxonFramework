@@ -116,7 +116,7 @@ class AggregateBasedJpaEventStorageEngineTest
     }
 
     @Override
-    protected EventMessage<String> convertPayload(EventMessage<?> original) {
+    protected EventMessage convertPayload(EventMessage original) {
         // TODO 3102 - This should be entirely removed once the AggregateBasedJpaEventStorageEngine uses a Converter instead of a Serializer
         return original.withConvertedPayload(String.class, new Converter() {
             @Override
@@ -300,7 +300,7 @@ class AggregateBasedJpaEventStorageEngineTest
                                     .collect(toList());
         GapAwareTrackingToken startPosition = GapAwareTrackingToken.newInstance(secondLastEventIndex, gaps);
 
-        MessageStream<EventMessage<?>> eventStream =
+        MessageStream<EventMessage> eventStream =
                 gapConfigTestSubject.stream(StreamingCondition.startingFrom(startPosition));
         assertThat(eventStream.hasNextAvailable()).isTrue();
         TrackingToken token = eventStream.next()

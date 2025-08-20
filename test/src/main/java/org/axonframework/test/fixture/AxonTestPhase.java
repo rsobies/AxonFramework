@@ -178,7 +178,7 @@ public interface AxonTestPhase {
          * @param messages The event messages to publish.
          * @return The current Given instance, for fluent interfacing.
          */
-        Given events(@Nonnull EventMessage<?>... messages);
+        Given events(@Nonnull EventMessage... messages);
 
         /**
          * Configures the given {@code events} as events in the "given" state. These events will be published in the
@@ -249,7 +249,7 @@ public interface AxonTestPhase {
          * @param messages The command messages to dispatch.
          * @return The current Given instance, for fluent interfacing.
          */
-        Given commands(@Nonnull CommandMessage<?>... messages);
+        Given commands(@Nonnull CommandMessage... messages);
 
         /**
          * Configures the given {@code commands} as commands in the "given" state. These commands will be dispatched in
@@ -378,7 +378,7 @@ public interface AxonTestPhase {
          * @param messages The event messages to publish.
          * @return The current When instance, for fluent interfacing.
          */
-        Event events(@Nonnull EventMessage<?>... messages);
+        Event events(@Nonnull EventMessage... messages);
 
         /**
          * Publishes the given Event Messages to the appropriate event handlers and records all activity for result
@@ -400,7 +400,7 @@ public interface AxonTestPhase {
          * Operations available in the Then phase of the test fixture execution only if command was dispatched during
          * the When phase.
          */
-        interface Command extends Message<Command> {
+        interface Command extends Message {
 
             /**
              * Expect a successful execution of the When phase, regardless of the actual return value.
@@ -444,7 +444,7 @@ public interface AxonTestPhase {
          * Operations available in the Then phase of the test fixture execution only if event was published during the
          * When phase.
          */
-        interface Event extends Message<Event> {
+        interface Event extends Message {
 
             /**
              * Expect a successful execution of the When phase, no exception raised while handling the event.
@@ -461,7 +461,7 @@ public interface AxonTestPhase {
          * @param <T> The type of the current Then instance, for fluent interfacing. The type depends on the operation
          *            which was triggered in the When phase.
          */
-        interface Message<T extends Message<T>> {
+        interface Message> {
 
             /**
              * Expect the given set of events to have been published during the {@link When} phase.
@@ -488,7 +488,7 @@ public interface AxonTestPhase {
              * @param expectedEvents The expected event messages, in the exact order they are expected to be published.
              * @return The current Then instance, for fluent interfacing.
              */
-            T events(@Nonnull EventMessage<?>... expectedEvents);
+            T events(@Nonnull EventMessage... expectedEvents);
 
             /**
              * Invokes the given {@code consumer} of the set of event messages that have been published during the When
@@ -497,7 +497,7 @@ public interface AxonTestPhase {
              * @param consumer Consumes the published events. You may place your own assertions here.
              * @return The current Then instance, for fluent interfacing.
              */
-            T eventsSatisfy(@Nonnull Consumer<List<EventMessage<?>>> consumer);
+            T eventsSatisfy(@Nonnull Consumer<List<EventMessage>> consumer);
 
             /**
              * Allow to check if the set of event messages which have been published during the When phase match given
@@ -506,7 +506,7 @@ public interface AxonTestPhase {
              * @param predicate The predicate to check the dispatched events against.
              * @return The current Then instance, for fluent interfacing.
              */
-            T eventsMatch(@Nonnull Predicate<List<EventMessage<?>>> predicate);
+            T eventsMatch(@Nonnull Predicate<List<EventMessage>> predicate);
 
             /**
              * Expect no events to have been published during the {@link When} phase.
@@ -540,7 +540,7 @@ public interface AxonTestPhase {
              *                         dispatched.
              * @return The current Then instance, for fluent interfacing.
              */
-            T commands(@Nonnull CommandMessage<?>... expectedCommands);
+            T commands(@Nonnull CommandMessage... expectedCommands);
 
             /**
              * Invokes the given {@code consumer} of the set of command messages that have been dispatched during the
@@ -549,7 +549,7 @@ public interface AxonTestPhase {
              * @param consumer Consumes the dispatched commands. You may place your own assertions here.
              * @return The current Then instance, for fluent interfacing.
              */
-            T commandsSatisfy(@Nonnull Consumer<List<CommandMessage<?>>> consumer);
+            T commandsSatisfy(@Nonnull Consumer<List<CommandMessage>> consumer);
 
             /**
              * Allow to check if the set of command messages which have been dispatched during the When phase match
@@ -558,7 +558,7 @@ public interface AxonTestPhase {
              * @param predicate The predicate to check the dispatched commands against.
              * @return The current Then instance, for fluent interfacing.
              */
-            T commandsMatch(@Nonnull Predicate<List<CommandMessage<?>>> predicate);
+            T commandsMatch(@Nonnull Predicate<List<CommandMessage>> predicate);
 
             /**
              * Expect no command messages to have been dispatched during the When phase.

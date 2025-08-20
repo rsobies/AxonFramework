@@ -45,7 +45,7 @@ public abstract class EventProcessorBuilder {
     protected String name;
     private EventHandlingComponent eventHandlingComponent;
     protected ErrorHandler errorHandler = PropagatingErrorHandler.INSTANCE;
-    protected MessageMonitor<? super EventMessage<?>> messageMonitor = NoOpMessageMonitor.INSTANCE;
+    protected MessageMonitor<? super EventMessage> messageMonitor = NoOpMessageMonitor.INSTANCE;
     protected EventProcessorSpanFactory spanFactory = DefaultEventProcessorSpanFactory.builder()
                                                                                       .spanFactory(NoOpSpanFactory.INSTANCE)
                                                                                       .build();
@@ -111,7 +111,7 @@ public abstract class EventProcessorBuilder {
      *                       processed
      * @return the current Builder instance, for fluent interfacing
      */
-    public EventProcessorBuilder messageMonitor(@Nonnull MessageMonitor<? super EventMessage<?>> messageMonitor) {
+    public EventProcessorBuilder messageMonitor(@Nonnull MessageMonitor<? super EventMessage> messageMonitor) {
         assertNonNull(messageMonitor, "MessageMonitor may not be null");
         this.messageMonitor = messageMonitor;
         return this;
@@ -169,7 +169,7 @@ public abstract class EventProcessorBuilder {
      *
      * @return The {@link MessageMonitor} for this {@link EventProcessor} implementation.
      */
-    public MessageMonitor<? super EventMessage<?>> messageMonitor() {
+    public MessageMonitor<? super EventMessage> messageMonitor() {
         return messageMonitor;
     }
 

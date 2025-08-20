@@ -123,8 +123,8 @@ class AxonServerEventStoreTest {
 
     @Test
     void publishAndConsumeEvents() throws Exception {
-        LegacyUnitOfWork<Message<?>> uow = LegacyDefaultUnitOfWork.startAndGet(null);
-        EventMessage<?>[] eventMessages = {EventTestUtils.asEventMessage("Test1"),
+        LegacyUnitOfWork<Message> uow = LegacyDefaultUnitOfWork.startAndGet(null);
+        EventMessage[] eventMessages = {EventTestUtils.asEventMessage("Test1"),
                 EventTestUtils.asEventMessage("Test2"),
                 EventTestUtils.asEventMessage("Test3")};
         testSubject.publish(eventMessages);
@@ -149,7 +149,7 @@ class AxonServerEventStoreTest {
         String queryAll = "";
         boolean noLiveUpdates = false;
 
-        LegacyUnitOfWork<Message<?>> uow = LegacyDefaultUnitOfWork.startAndGet(null);
+        LegacyUnitOfWork<Message> uow = LegacyDefaultUnitOfWork.startAndGet(null);
         testSubject.publish(EventTestUtils.asEventMessage("Test1"),
                             EventTestUtils.asEventMessage("Test2"),
                             EventTestUtils.asEventMessage("Test3"));
@@ -169,13 +169,13 @@ class AxonServerEventStoreTest {
             return si.flatMap(i -> Stream.of(i, i));
         });
         testSubject.publish(
-                new GenericDomainEventMessage<>(
+                new GenericDomainEventMessage(
                         AGGREGATE_TYPE, AGGREGATE_ID, 0, new MessageType("event"), "Test1"
                 ),
-                new GenericDomainEventMessage<>(
+                new GenericDomainEventMessage(
                         AGGREGATE_TYPE, AGGREGATE_ID, 1, new MessageType("event"), "Test2"
                 ),
-                new GenericDomainEventMessage<>(
+                new GenericDomainEventMessage(
                         AGGREGATE_TYPE, AGGREGATE_ID, 2, new MessageType("event"), "Test3"
                 )
         );
@@ -199,17 +199,17 @@ class AxonServerEventStoreTest {
             return si.flatMap(i -> Stream.of(i, i));
         });
         testSubject.publish(
-                new GenericDomainEventMessage<>(
+                new GenericDomainEventMessage(
                         AGGREGATE_TYPE, AGGREGATE_ID, 0, new MessageType("event"), "Test1"
                 ),
-                new GenericDomainEventMessage<>(
+                new GenericDomainEventMessage(
                         AGGREGATE_TYPE, AGGREGATE_ID, 1, new MessageType("event"), "Test2"
                 ),
-                new GenericDomainEventMessage<>(
+                new GenericDomainEventMessage(
                         AGGREGATE_TYPE, AGGREGATE_ID, 2, new MessageType("event"), "Test3"
                 )
         );
-        DomainEventMessage<String> snapshotEvent = new GenericDomainEventMessage<>(
+        DomainEventMessage snapshotEvent = new GenericDomainEventMessage(
                 AGGREGATE_TYPE, AGGREGATE_ID, 1, new MessageType("snapshot"), "Snapshot1"
         );
         testSubject.storeSnapshot(snapshotEvent);
@@ -261,13 +261,13 @@ class AxonServerEventStoreTest {
         };
         when(upcasterChain.upcast(any())).thenAnswer(i -> upcaster.upcast(i.getArgument(0)));
         testSubject.publish(
-                new GenericDomainEventMessage<>(
+                new GenericDomainEventMessage(
                         AGGREGATE_TYPE, AGGREGATE_ID, 0, new MessageType("event"), "Test1"
                 ),
-                new GenericDomainEventMessage<>(
+                new GenericDomainEventMessage(
                         AGGREGATE_TYPE, AGGREGATE_ID, 1, new MessageType("event"), "Test2"
                 ),
-                new GenericDomainEventMessage<>(
+                new GenericDomainEventMessage(
                         AGGREGATE_TYPE, AGGREGATE_ID, 2, new MessageType("event"), "Test3"
                 )
         );
@@ -292,7 +292,7 @@ class AxonServerEventStoreTest {
 
     @Test
     void usingLocalEventStoreOnOpeningStream() {
-        DomainEventMessage<String> testEvent = new GenericDomainEventMessage<>(
+        DomainEventMessage testEvent = new GenericDomainEventMessage(
                 AGGREGATE_TYPE, AGGREGATE_ID, 0, new MessageType("event"), "Test1"
         );
         testSubject.publish(testEvent);
@@ -303,7 +303,7 @@ class AxonServerEventStoreTest {
 
     @Test
     void usingLocalEventStoreOnQueryingEvents() {
-        DomainEventMessage<String> testEvent = new GenericDomainEventMessage<>(
+        DomainEventMessage testEvent = new GenericDomainEventMessage(
                 AGGREGATE_TYPE, AGGREGATE_ID, 0, new MessageType("event"), "Test1"
         );
         testSubject.publish(testEvent);
@@ -316,17 +316,17 @@ class AxonServerEventStoreTest {
     @Test
     void readEventsReturnsSnapshotsAndEventsWithMetaData() {
         Map<String, String> testMetaData = Collections.singletonMap("key", "value");
-        DomainEventMessage<String> testSnapshot = new GenericDomainEventMessage<>(
+        DomainEventMessage testSnapshot = new GenericDomainEventMessage(
                 AGGREGATE_TYPE, AGGREGATE_ID, 1, new MessageType("snapshot"),
                 "Snapshot1", testMetaData
         );
-        DomainEventMessage<String> testEventOne = new GenericDomainEventMessage<>(
+        DomainEventMessage testEventOne = new GenericDomainEventMessage(
                 AGGREGATE_TYPE, AGGREGATE_ID, 0, new MessageType("event"), "Test1", testMetaData
         );
-        DomainEventMessage<String> testEventTwo = new GenericDomainEventMessage<>(
+        DomainEventMessage testEventTwo = new GenericDomainEventMessage(
                 AGGREGATE_TYPE, AGGREGATE_ID, 1, new MessageType("event"), "Test2", testMetaData
         );
-        DomainEventMessage<String> testEventThree = new GenericDomainEventMessage<>(
+        DomainEventMessage testEventThree = new GenericDomainEventMessage(
                 AGGREGATE_TYPE, AGGREGATE_ID, 2, new MessageType("event"), "Test3", testMetaData
         );
 
@@ -343,13 +343,13 @@ class AxonServerEventStoreTest {
         DomainEventStream resultStream = testSubject.readEvents(AGGREGATE_ID);
 
         assertTrue(resultStream.hasNext());
-        DomainEventMessage<?> resultSnapshot = resultStream.next();
+        DomainEventMessage resultSnapshot = resultStream.next();
         assertEquals("Snapshot1", resultSnapshot.payload());
         assertTrue(resultSnapshot.metaData().containsKey("key"));
         assertTrue(resultSnapshot.metaData().containsValue("value"));
 
         assertTrue(resultStream.hasNext());
-        DomainEventMessage<?> resultEvent = resultStream.next();
+        DomainEventMessage resultEvent = resultStream.next();
         assertEquals("Test3", resultEvent.payload());
         assertTrue(resultEvent.metaData().containsKey("key"));
         assertTrue(resultEvent.metaData().containsValue("value"));
@@ -360,17 +360,17 @@ class AxonServerEventStoreTest {
     @Test
     void readEventsWithSequenceNumberIgnoresSnapshots() {
         Map<String, String> testMetaData = Collections.singletonMap("key", "value");
-        DomainEventMessage<String> testSnapshot = new GenericDomainEventMessage<>(
+        DomainEventMessage testSnapshot = new GenericDomainEventMessage(
                 AGGREGATE_TYPE, AGGREGATE_ID, 1, new MessageType("snapshot"),
                 "Snapshot1", testMetaData
         );
-        DomainEventMessage<String> testEventOne = new GenericDomainEventMessage<>(
+        DomainEventMessage testEventOne = new GenericDomainEventMessage(
                 AGGREGATE_TYPE, AGGREGATE_ID, 0, new MessageType("event"), "Test1", testMetaData
         );
-        DomainEventMessage<String> testEventTwo = new GenericDomainEventMessage<>(
+        DomainEventMessage testEventTwo = new GenericDomainEventMessage(
                 AGGREGATE_TYPE, AGGREGATE_ID, 1, new MessageType("event"), "Test2", testMetaData
         );
-        DomainEventMessage<String> testEventThree = new GenericDomainEventMessage<>(
+        DomainEventMessage testEventThree = new GenericDomainEventMessage(
                 AGGREGATE_TYPE, AGGREGATE_ID, 2, new MessageType("event"), "Test3", testMetaData
         );
 
@@ -387,19 +387,19 @@ class AxonServerEventStoreTest {
         DomainEventStream resultStream = testSubject.readEvents(AGGREGATE_ID, 0);
 
         assertTrue(resultStream.hasNext());
-        DomainEventMessage<?> firstResultEvent = resultStream.next();
+        DomainEventMessage firstResultEvent = resultStream.next();
         assertEquals("Test1", firstResultEvent.payload());
         assertTrue(firstResultEvent.metaData().containsKey("key"));
         assertTrue(firstResultEvent.metaData().containsValue("value"));
 
         assertTrue(resultStream.hasNext());
-        DomainEventMessage<?> secondResultEvent = resultStream.next();
+        DomainEventMessage secondResultEvent = resultStream.next();
         assertEquals("Test2", secondResultEvent.payload());
         assertTrue(secondResultEvent.metaData().containsKey("key"));
         assertTrue(secondResultEvent.metaData().containsValue("value"));
 
         assertTrue(resultStream.hasNext());
-        DomainEventMessage<?> thirdResultEvent = resultStream.next();
+        DomainEventMessage thirdResultEvent = resultStream.next();
         assertEquals("Test3", thirdResultEvent.payload());
         assertTrue(thirdResultEvent.metaData().containsKey("key"));
         assertTrue(thirdResultEvent.metaData().containsValue("value"));
@@ -423,17 +423,17 @@ class AxonServerEventStoreTest {
     @Test
     void readEventsWithMagicSequenceNumberAndSnapshotFilterSetIgnoresSnapshots() {
         Map<String, String> testMetaData = Collections.singletonMap("key", "value");
-        DomainEventMessage<String> testSnapshot = new GenericDomainEventMessage<>(
+        DomainEventMessage testSnapshot = new GenericDomainEventMessage(
                 AGGREGATE_TYPE, AGGREGATE_ID, 1, new MessageType("snapshot"),
                 "Snapshot1", testMetaData
         );
-        DomainEventMessage<String> testEventOne = new GenericDomainEventMessage<>(
+        DomainEventMessage testEventOne = new GenericDomainEventMessage(
                 AGGREGATE_TYPE, AGGREGATE_ID, 0, new MessageType("event"), "Test1", testMetaData
         );
-        DomainEventMessage<String> testEventTow = new GenericDomainEventMessage<>(
+        DomainEventMessage testEventTow = new GenericDomainEventMessage(
                 AGGREGATE_TYPE, AGGREGATE_ID, 1, new MessageType("event"), "Test2", testMetaData
         );
-        DomainEventMessage<String> testEventThree = new GenericDomainEventMessage<>(
+        DomainEventMessage testEventThree = new GenericDomainEventMessage(
                 AGGREGATE_TYPE, AGGREGATE_ID, 2, new MessageType("event"), "Test3", testMetaData
         );
 
@@ -450,19 +450,19 @@ class AxonServerEventStoreTest {
         DomainEventStream resultStream = testSubject.readEvents(AGGREGATE_ID, -42);
 
         assertTrue(resultStream.hasNext());
-        DomainEventMessage<?> firstResultEvent = resultStream.next();
+        DomainEventMessage firstResultEvent = resultStream.next();
         assertEquals("Test1", firstResultEvent.payload());
         assertTrue(firstResultEvent.metaData().containsKey("key"));
         assertTrue(firstResultEvent.metaData().containsValue("value"));
 
         assertTrue(resultStream.hasNext());
-        DomainEventMessage<?> secondResultEvent = resultStream.next();
+        DomainEventMessage secondResultEvent = resultStream.next();
         assertEquals("Test2", secondResultEvent.payload());
         assertTrue(secondResultEvent.metaData().containsKey("key"));
         assertTrue(secondResultEvent.metaData().containsValue("value"));
 
         assertTrue(resultStream.hasNext());
-        DomainEventMessage<?> thirdResultEvent = resultStream.next();
+        DomainEventMessage thirdResultEvent = resultStream.next();
         assertEquals("Test3", thirdResultEvent.payload());
         assertTrue(thirdResultEvent.metaData().containsKey("key"));
         assertTrue(thirdResultEvent.metaData().containsValue("value"));
@@ -483,17 +483,17 @@ class AxonServerEventStoreTest {
                                           .build();
 
         Map<String, String> testMetaData = Collections.singletonMap("key", "value");
-        DomainEventMessage<String> testSnapshot = new GenericDomainEventMessage<>(
+        DomainEventMessage testSnapshot = new GenericDomainEventMessage(
                 AGGREGATE_TYPE, AGGREGATE_ID, 1, new MessageType("snapshot"),
                 "Snapshot1", testMetaData
         );
-        DomainEventMessage<String> testEventOne = new GenericDomainEventMessage<>(
+        DomainEventMessage testEventOne = new GenericDomainEventMessage(
                 AGGREGATE_TYPE, AGGREGATE_ID, 0, new MessageType("event"), "Test1", testMetaData
         );
-        DomainEventMessage<String> testEventTwo = new GenericDomainEventMessage<>(
+        DomainEventMessage testEventTwo = new GenericDomainEventMessage(
                 AGGREGATE_TYPE, AGGREGATE_ID, 1, new MessageType("event"), "Test2", testMetaData
         );
-        DomainEventMessage<String> testEventThree = new GenericDomainEventMessage<>(
+        DomainEventMessage testEventThree = new GenericDomainEventMessage(
                 AGGREGATE_TYPE, AGGREGATE_ID, 2, new MessageType("event"), "Test3", testMetaData
         );
 
@@ -510,13 +510,13 @@ class AxonServerEventStoreTest {
         DomainEventStream resultStream = testSubject.readEvents(AGGREGATE_ID);
 
         assertTrue(resultStream.hasNext());
-        DomainEventMessage<?> firstResultEvent = resultStream.next();
+        DomainEventMessage firstResultEvent = resultStream.next();
         assertEquals("Snapshot1", firstResultEvent.payload());
         assertTrue(firstResultEvent.metaData().containsKey("key"));
         assertTrue(firstResultEvent.metaData().containsValue("value"));
 
         assertTrue(resultStream.hasNext());
-        DomainEventMessage<?> thirdResultEvent = resultStream.next();
+        DomainEventMessage thirdResultEvent = resultStream.next();
         assertEquals("Test3", thirdResultEvent.payload());
         assertTrue(thirdResultEvent.metaData().containsKey("key"));
         assertTrue(thirdResultEvent.metaData().containsValue("value"));
@@ -547,19 +547,19 @@ class AxonServerEventStoreTest {
         //noinspection unchecked
         Map<String, String> testMetaData = Collections.EMPTY_MAP;
 
-        DomainEventMessage<String> testSnapshot = new GenericDomainEventMessage<>(
+        DomainEventMessage testSnapshot = new GenericDomainEventMessage(
                 AGGREGATE_TYPE, AGGREGATE_ID, 1, new MessageType("snapshot"),
                 "Snapshot1", testMetaData
         );
-        DomainEventMessage<String> testEventOne = new GenericDomainEventMessage<>(
+        DomainEventMessage testEventOne = new GenericDomainEventMessage(
                 AGGREGATE_TYPE, AGGREGATE_ID, 0, new MessageType("event"),
                 testPayloadOne, testMetaData
         );
-        DomainEventMessage<String> testEventTwo = new GenericDomainEventMessage<>(
+        DomainEventMessage testEventTwo = new GenericDomainEventMessage(
                 AGGREGATE_TYPE, AGGREGATE_ID, 1, new MessageType("event"),
                 testPayloadTwo, testMetaData
         );
-        DomainEventMessage<String> testEventThree = new GenericDomainEventMessage<>(
+        DomainEventMessage testEventThree = new GenericDomainEventMessage(
                 AGGREGATE_TYPE, AGGREGATE_ID, 2, new MessageType("event"),
                 testPayloadThree, testMetaData
         );
@@ -573,15 +573,15 @@ class AxonServerEventStoreTest {
         DomainEventStream resultStream = testSubject.readEvents(AGGREGATE_ID);
 
         assertTrue(resultStream.hasNext());
-        DomainEventMessage<?> firstResultEvent = resultStream.next();
+        DomainEventMessage firstResultEvent = resultStream.next();
         assertEquals(testPayloadOne, firstResultEvent.payload());
 
         assertTrue(resultStream.hasNext());
-        DomainEventMessage<?> secondResultEvent = resultStream.next();
+        DomainEventMessage secondResultEvent = resultStream.next();
         assertEquals(testPayloadTwo, secondResultEvent.payload());
 
         assertTrue(resultStream.hasNext());
-        DomainEventMessage<?> thirdResultEvent = resultStream.next();
+        DomainEventMessage thirdResultEvent = resultStream.next();
         assertEquals(testPayloadThree, thirdResultEvent.payload());
 
         assertFalse(resultStream.hasNext());

@@ -43,7 +43,7 @@ class DirectEventJobDataBinderTest {
 
     private static final String TEST_EVENT_PAYLOAD = "event-payload";
 
-    private final EventMessage<String> testEventMessage;
+    private final EventMessage testEventMessage;
     private final MetaData testMetaData;
 
     DirectEventJobDataBinderTest() {
@@ -107,7 +107,7 @@ class DirectEventJobDataBinderTest {
 
         assertTrue(result instanceof EventMessage);
 
-        EventMessage<String> resultEventMessage = (EventMessage<String>) result;
+        EventMessage resultEventMessage = (EventMessage) result;
 
         assertEquals(testEventMessage.identifier(), resultEventMessage.identifier());
         assertEquals(testEventMessage.timestamp(), resultEventMessage.timestamp());

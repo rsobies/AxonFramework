@@ -169,7 +169,7 @@ class PooledStreamingEventProcessorTest {
                                                           .when(spy)
                                                           .initializeTokenSegments(any(), anyInt(), any());
 
-        List<EventMessage<Integer>> events =
+        List<EventMessage> events =
                 createEvents(100);
         events.forEach(stubMessageSource::publishMessage);
         testSubject.start();
@@ -217,7 +217,7 @@ class PooledStreamingEventProcessorTest {
     }
 
     private void startAndAssertProcessorClaimsAllTokens() {
-        List<EventMessage<Integer>> events =
+        List<EventMessage> events =
                 createEvents(100);
         events.forEach(stubMessageSource::publishMessage);
 
@@ -237,10 +237,10 @@ class PooledStreamingEventProcessorTest {
     @Test
     void handlingEventsAreCorrectlyTraced() throws Exception {
         CountDownLatch countDownLatch = new CountDownLatch(8);
-        List<Message<?>> invokedMessages = new CopyOnWriteArrayList<>();
+        List<Message> invokedMessages = new CopyOnWriteArrayList<>();
         doAnswer(
                 answer -> {
-                    EventMessage<?> message = answer.getArgument(0, EventMessage.class);
+                    EventMessage message = answer.getArgument(0, EventMessage.class);
                     invokedMessages.add(message);
                     spanFactory.verifySpanActive("StreamingEventProcessor.batch");
                     spanFactory.verifySpanActive("StreamingEventProcessor.process", message);
@@ -249,7 +249,7 @@ class PooledStreamingEventProcessorTest {
                 }
         ).when(stubEventHandlingComponent).handle(any(), any());
 
-        List<EventMessage<Integer>> events = createEvents(8);
+        List<EventMessage> events = createEvents(8);
         events.forEach(stubMessageSource::publishMessage);
         testSubject.start();
         assertTrue(countDownLatch.await(5, TimeUnit.SECONDS));
@@ -283,7 +283,7 @@ class PooledStreamingEventProcessorTest {
                 }
         ).when(stubEventHandlingComponent).handle(any(), any());
 
-        List<EventMessage<Integer>> events = createEvents(8);
+        List<EventMessage> events = createEvents(8);
         events.forEach(stubMessageSource::publishMessage);
         testSubject.start();
         assertTrue(countDownLatch.await(5, TimeUnit.SECONDS));
@@ -314,7 +314,7 @@ class PooledStreamingEventProcessorTest {
         testSubject.start();
         testSubject.shutDown();
 
-        List<EventMessage<Integer>> events = createEvents(100);
+        List<EventMessage> events = createEvents(100);
         events.forEach(stubMessageSource::publishMessage);
 
         testSubject.start();
@@ -335,7 +335,7 @@ class PooledStreamingEventProcessorTest {
 
     @Test
     void allTokensUpdatedToLatestValue() {
-        List<EventMessage<Integer>> events = createEvents(100);
+        List<EventMessage> events = createEvents(100);
         events.forEach(stubMessageSource::publishMessage);
 
         testSubject.start();
@@ -358,8 +358,8 @@ class PooledStreamingEventProcessorTest {
     @Test
     void exceptionWhileHandlingEventAbortsWorker() throws Exception {
         MessageType testName = new MessageType("event");
-        List<EventMessage<Integer>> events = Stream.of(1, 2, 2, 4, 5)
-                                                   .map(i -> new GenericEventMessage<>(testName, i))
+        List<EventMessage> events = Stream.of(1, 2, 2, 4, 5)
+                                                   .map(i -> new GenericEventMessage(testName, i))
                                                    .collect(Collectors.toList());
         doReturn(MessageStream.failed(new RuntimeException("Simulating worker failure")))
                 .doReturn(MessageStream.empty())
@@ -418,7 +418,7 @@ class PooledStreamingEventProcessorTest {
         when(stubEventHandlingComponent.supports(integerTypeName)).thenReturn(false);
 
         // when - Publish an Integer event that will reach the processor but won't be handled
-        EventMessage<Integer> eventToIgnore = EventTestUtils.asEventMessage(1337);
+        EventMessage eventToIgnore = EventTestUtils.asEventMessage(1337);
         stubMessageSource.publishMessage(eventToIgnore);
         testSubject.start();
 
@@ -453,7 +453,7 @@ class PooledStreamingEventProcessorTest {
         );
 
         // when
-        EventMessage<Integer> supportedEvent = EventTestUtils.asEventMessage("Payload");
+        EventMessage supportedEvent = EventTestUtils.asEventMessage("Payload");
         stubMessageSource.publishMessage(supportedEvent);
         testSubject.start();
 
@@ -479,7 +479,7 @@ class PooledStreamingEventProcessorTest {
                                                            .eventCriteria((__) -> stringOnlyCriteria)));
 
         // when - Publish an Integer event that will be filtered out by EventCriteria before reaching processor
-        EventMessage<Integer> eventToFilter = EventTestUtils.asEventMessage(1337);
+        EventMessage eventToFilter = EventTestUtils.asEventMessage(1337);
         stubMessageSource.publishMessage(eventToFilter);
         testSubject.start();
 
@@ -521,16 +521,16 @@ class PooledStreamingEventProcessorTest {
         setTestSubject(createTestSubject(builder -> builder.initialSegmentCount(1)
                                                            .eventCriteria((__) -> stringOnlyCriteria)));
 
-        EventMessage<Integer> eventToIgnoreOne = EventTestUtils.asEventMessage(1337);
-        EventMessage<Integer> eventToIgnoreTwo = EventTestUtils.asEventMessage(42);
-        EventMessage<Integer> eventToIgnoreThree = EventTestUtils.asEventMessage(9001);
+        EventMessage eventToIgnoreOne = EventTestUtils.asEventMessage(1337);
+        EventMessage eventToIgnoreTwo = EventTestUtils.asEventMessage(42);
+        EventMessage eventToIgnoreThree = EventTestUtils.asEventMessage(9001);
         List<Integer> eventsToIgnore = new ArrayList<>();
         eventsToIgnore.add(eventToIgnoreOne.payload());
         eventsToIgnore.add(eventToIgnoreTwo.payload());
         eventsToIgnore.add(eventToIgnoreThree.payload());
 
-        EventMessage<String> eventToHandleOne = EventTestUtils.asEventMessage("some-text");
-        EventMessage<String> eventToHandleTwo = EventTestUtils.asEventMessage("some-other-text");
+        EventMessage eventToHandleOne = EventTestUtils.asEventMessage("some-text");
+        EventMessage eventToHandleTwo = EventTestUtils.asEventMessage("some-other-text");
         List<String> eventsToHandle = new ArrayList<>();
         eventsToHandle.add(eventToHandleOne.payload());
         eventsToHandle.add(eventToHandleTwo.payload());
@@ -552,12 +552,12 @@ class PooledStreamingEventProcessorTest {
               .untilAsserted(() -> assertThat(testSubject.processingStatus()).hasSize(1));
 
         // then - Verify that only String events are handled (Integer events are filtered out by EventCriteria).
-        ArgumentCaptor<EventMessage<?>> handledEventsCaptor = ArgumentCaptor.forClass(EventMessage.class);
+        ArgumentCaptor<EventMessage> handledEventsCaptor = ArgumentCaptor.forClass(EventMessage.class);
         await().atMost(1, TimeUnit.SECONDS)
                 .untilAsserted(() -> verify(stubEventHandlingComponent, times(2)).handle(handledEventsCaptor.capture(), any()));
 
         // then - Validate that the correct String events were handled.
-        List<EventMessage<?>> handledEvents = handledEventsCaptor.getAllValues();
+        List<EventMessage> handledEvents = handledEventsCaptor.getAllValues();
         assertThat(handledEvents).hasSize(2);
 
         List<Object> handledPayloads = handledEvents.stream()
@@ -566,7 +566,7 @@ class PooledStreamingEventProcessorTest {
         assertThat(handledPayloads).containsExactlyInAnyOrderElementsOf(eventsToHandle);
 
         // then - Verify that ignored events are tracked correctly
-        List<EventMessage<?>> ignoredEvents = stubMessageSource.getIgnoredEvents();
+        List<EventMessage> ignoredEvents = stubMessageSource.getIgnoredEvents();
         assertThat(ignoredEvents).hasSize(3);
 
         List<Object> ignoredPayloads = ignoredEvents.stream()
@@ -583,7 +583,7 @@ class PooledStreamingEventProcessorTest {
         setTestSubject(createTestSubject(builder -> builder.eventSource(testMessageSource)));
 
         Stream.of(0, 1, 2, 3)
-              .map(i -> new GenericEventMessage<>(new MessageType("event"), i))
+              .map(i -> new GenericEventMessage(new MessageType("event"), i))
               .forEach(testMessageSource::publishMessage);
 
         testSubject.start();
@@ -599,7 +599,7 @@ class PooledStreamingEventProcessorTest {
         });
 
         Stream.of(4, 5, 6, 7)
-              .map(i -> new GenericEventMessage<>(new MessageType("event"), i))
+              .map(i -> new GenericEventMessage(new MessageType("event"), i))
               .forEach(testMessageSource::publishMessage);
         testMessageSource.runOnAvailableCallback();
 
@@ -618,7 +618,7 @@ class PooledStreamingEventProcessorTest {
             throws InterruptedException, ExecutionException, TimeoutException {
         testSubject.start();
         Stream.of(1, 2, 2, 4, 5)
-              .map(i -> new GenericEventMessage<>(new MessageType("event"), i))
+              .map(i -> new GenericEventMessage(new MessageType("event"), i))
               .forEach(stubMessageSource::publishMessage);
 
         assertWithin(1, TimeUnit.SECONDS, () -> assertFalse(testSubject.processingStatus().isEmpty()));
@@ -656,7 +656,7 @@ class PooledStreamingEventProcessorTest {
         testSubject.start();
 
         Stream.of(1, 2, 2, 4, 5)
-              .map(i -> new GenericEventMessage<>(new MessageType("event"), i))
+              .map(i -> new GenericEventMessage(new MessageType("event"), i))
               .forEach(stubMessageSource::publishMessage);
 
         assertWithin(1, TimeUnit.SECONDS, () -> assertFalse(testSubject.processingStatus().isEmpty()));
@@ -694,14 +694,14 @@ class PooledStreamingEventProcessorTest {
 
         // After one exception the Coordinator#errorWaitBackOff is 1 second. After this, the Coordinator should proceed.
         Stream.of(1, 2, 2, 4, 5)
-              .map(i -> new GenericEventMessage<>(new MessageType("event"), i))
+              .map(i -> new GenericEventMessage(new MessageType("event"), i))
               .forEach(stubMessageSource::publishMessage);
         assertWithin(1500, TimeUnit.MILLISECONDS, () -> assertFalse(testSubject.isError()));
     }
 
     @Test
     void isErrorWhenOpeningTheStreamFails() {
-        StreamableEventSource<EventMessage<?>> spiedMessageSource = spy(new AsyncInMemoryStreamableEventSource());
+        StreamableEventSource<EventMessage> spiedMessageSource = spy(new AsyncInMemoryStreamableEventSource());
         when(spiedMessageSource.open(any())).thenThrow(new IllegalStateException("Failed to open the stream"))
                                             .thenCallRealMethod();
         setTestSubject(createTestSubject(builder -> builder.eventSource(spiedMessageSource)));
@@ -714,7 +714,7 @@ class PooledStreamingEventProcessorTest {
 
         // After one exception the Coordinator#errorWaitBackOff is 1 second. After this, the Coordinator should proceed.
         Stream.of(1, 2, 2, 4, 5)
-              .map(i -> new GenericEventMessage<>(new MessageType("event"), i))
+              .map(i -> new GenericEventMessage(new MessageType("event"), i))
               .forEach(stubMessageSource::publishMessage);
         assertWithin(1500, TimeUnit.MILLISECONDS, () -> assertFalse(testSubject.isError()));
     }
@@ -1043,7 +1043,7 @@ class PooledStreamingEventProcessorTest {
         testSubject.start();
 
         Stream.of(1, 2, 2, 4, 5)
-              .map(i -> new GenericEventMessage<>(new MessageType("event"), i))
+              .map(i -> new GenericEventMessage(new MessageType("event"), i))
               .forEach(stubMessageSource::publishMessage);
 
         assertWithin(
@@ -1241,7 +1241,7 @@ class PooledStreamingEventProcessorTest {
 
         setTestSubject(createTestSubject(builder -> builder.initialSegmentCount(1)));
 
-        List<EventMessage<Integer>> events = createEvents(100);
+        List<EventMessage> events = createEvents(100);
         testSubject.start();
 
         events.forEach(stubMessageSource::publishMessage);
@@ -1274,7 +1274,7 @@ class PooledStreamingEventProcessorTest {
     void isCaughtUpWhenDoneProcessing() throws Exception {
         mockSlowEventHandler();
         setTestSubject(createTestSubject(builder -> builder.initialSegmentCount(1)));
-        List<EventMessage<Integer>> events = createEvents(3);
+        List<EventMessage> events = createEvents(3);
         events.forEach(stubMessageSource::publishMessage);
 
         testSubject.start();
@@ -1301,9 +1301,9 @@ class PooledStreamingEventProcessorTest {
         setTestSubject(createTestSubject(b -> b.initialSegmentCount(1)));
 
         CountDownLatch countDownLatch = new CountDownLatch(3);
-        testSubject.registerHandlerInterceptor(new MessageHandlerInterceptor<EventMessage<?>>() {
+        testSubject.registerHandlerInterceptor(new MessageHandlerInterceptor<EventMessage>() {
             @Override
-            public Object handle(@Nonnull LegacyUnitOfWork<? extends EventMessage<?>> unitOfWork,
+            public Object handle(@Nonnull LegacyUnitOfWork<? extends EventMessage> unitOfWork,
                                  @Nonnull ProcessingContext context,
                                  @Nonnull InterceptorChain interceptorChain) throws Exception {
                 unitOfWork.onCleanup(uow -> countDownLatch.countDown());
@@ -1311,7 +1311,7 @@ class PooledStreamingEventProcessorTest {
             }
 
             @Override
-            public <M extends EventMessage<?>, R extends Message<?>> MessageStream<R> interceptOnHandle(
+            public <M extends EventMessage, R extends Message> MessageStream<R> interceptOnHandle(
                     @Nonnull M message,
                     @Nonnull ProcessingContext context,
                     @Nonnull InterceptorChain<M, R> interceptorChain) {
@@ -1336,7 +1336,7 @@ class PooledStreamingEventProcessorTest {
         CountDownLatch countDownLatch = new CountDownLatch(3);
         testSubject.registerHandlerInterceptor(new MessageHandlerInterceptor<>() {
             @Override
-            public Object handle(@Nonnull LegacyUnitOfWork<? extends EventMessage<?>> unitOfWork,
+            public Object handle(@Nonnull LegacyUnitOfWork<? extends EventMessage> unitOfWork,
                                  @Nonnull ProcessingContext context,
                                  @Nonnull InterceptorChain interceptorChain) throws Exception {
                 unitOfWork.onCleanup(uow -> countDownLatch.countDown());
@@ -1344,7 +1344,7 @@ class PooledStreamingEventProcessorTest {
             }
 
             @Override
-            public <M extends EventMessage<?>, R extends Message<?>> MessageStream<R> interceptOnHandle(
+            public <M extends EventMessage, R extends Message> MessageStream<R> interceptOnHandle(
                     @Nonnull M message, @Nonnull ProcessingContext context,
                     @Nonnull InterceptorChain<M, R> interceptorChain) {
                 context.doFinally(uow -> countDownLatch.countDown());
@@ -1386,7 +1386,7 @@ class PooledStreamingEventProcessorTest {
         }).when(stubEventHandlingComponent)
           .handle(any(), any());
 
-        List<EventMessage<Integer>> events = createEvents(42);
+        List<EventMessage> events = createEvents(42);
         events.forEach(stubMessageSource::publishMessage);
 
         testSubject.start();
@@ -1431,7 +1431,7 @@ class PooledStreamingEventProcessorTest {
         }).when(stubEventHandlingComponent)
           .handle(any(), any());
 
-        List<EventMessage<Integer>> events = createEvents(42);
+        List<EventMessage> events = createEvents(42);
         events.forEach(stubMessageSource::publishMessage);
 
         testSubject.start();
