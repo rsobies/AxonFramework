@@ -164,7 +164,13 @@
         <maven-surefire.version>3.5.3</maven-surefire.version>
         <maven-resources.version>3.3.1</maven-resources.version>
     </properties>
-
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>AxonFramework</name>
+            <url>https://maven.pkg.github.com/rsobies/AxonFramework</url>
+        </repository>
+    </distributionManagement>
     <dependencies>
         <!-- Testing -->
         <dependency>

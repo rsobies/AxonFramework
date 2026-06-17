@@ -71,7 +71,8 @@ public class AxonThreadFactory implements ThreadFactory {
 
     @Override
     public Thread newThread(@Nonnull Runnable r) {
-        Thread thread = new Thread(threadGroup, r, threadGroup.getName() + "-" + nextThreadNumber());
+
+        Thread thread = Thread.ofVirtual().name(threadGroup.getName() + "-" + nextThreadNumber()).factory().newThread(r);// new Thread(threadGroup, r, threadGroup.getName() + "-" + nextThreadNumber());
         thread.setPriority(priority);
         return thread;
     }
