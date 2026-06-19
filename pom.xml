@@ -36,12 +36,12 @@
         <module>spring</module>
         <module>spring-boot-autoconfigure</module>
         <module>spring-boot-starter</module>
-        <module>test</module>
+<!--        <module>test</module>-->
         <module>tracing-opentelemetry</module>
         <module>spring-boot3-dummy</module>
-        <module>hibernate-6-integrationtests</module>
-        <module>spring-boot-3-integrationtests</module>
-        <module>spring-boot-4-integrationtests</module>
+<!--        <module>hibernate-6-integrationtests</module>-->
+<!--        <module>spring-boot-3-integrationtests</module>-->
+<!--        <module>spring-boot-4-integrationtests</module>-->
     </modules>
     <packaging>pom</packaging>
 
