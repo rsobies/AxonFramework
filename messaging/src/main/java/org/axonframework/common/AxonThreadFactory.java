@@ -29,8 +29,8 @@ import javax.annotation.Nonnull;
 public class AxonThreadFactory implements ThreadFactory {
 
     private final int priority;
-    private final ThreadGroup threadGroup;
-    private final AtomicInteger threadNumber = new AtomicInteger();
+    //private final ThreadGroup threadGroup;
+    //private final AtomicInteger threadNumber = new AtomicInteger();
 
     /**
      * Initializes a ThreadFactory instance that creates each thread in a group with given {@code groupName} with
@@ -66,7 +66,7 @@ public class AxonThreadFactory implements ThreadFactory {
         Assert.isTrue(priority <= Thread.MAX_PRIORITY && priority >= Thread.MIN_PRIORITY,
                       () -> "Given priority is invalid");
         this.priority = priority;
-        this.threadGroup = group;
+        //this.threadGroup = group;
     }
 
     @Override
