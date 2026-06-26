@@ -19,7 +19,7 @@
 
     <groupId>org.axonframework</groupId>
     <artifactId>axon</artifactId>
-    <version>4.13.1-vt</version>
+    <version>4.13.1-vt2</version>
     <modules>
         <module>axon-server-connector</module>
         <module>disruptor</module>
