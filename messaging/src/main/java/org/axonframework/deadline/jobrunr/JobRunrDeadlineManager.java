@@ -47,6 +47,7 @@ import org.jobrunr.jobs.JobId;
 import org.jobrunr.jobs.states.IllegalJobStateChangeException;
 import org.jobrunr.jobs.states.StateName;
 import org.jobrunr.scheduling.JobBuilder;
+import org.jobrunr.scheduling.JobRequestScheduler;
 import org.jobrunr.scheduling.JobScheduler;
 import org.slf4j.Logger;
 
@@ -64,7 +65,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Implementation of {@link DeadlineManager} that delegates scheduling and triggering to a Jobrunr
- * {@link JobScheduler}.
+ * {@link JobRequestScheduler}.
  *
  * @author Tom de Backer
  * @author Gerard Klijs
@@ -80,7 +81,7 @@ public class JobRunrDeadlineManager extends AbstractDeadlineManager implements L
                     + "Using 'cancelSchedule' requires keeping track of the returned 'scheduleId' from invoking 'schedule'.";
 
     private final ScopeAwareProvider scopeAwareProvider;
-    private final JobScheduler jobScheduler;
+    private final JobRequestScheduler jobRequestScheduler;
     private final Serializer serializer;
     private final TransactionManager transactionManager;
     private final DeadlineManagerSpanFactory spanFactory;
@@ -92,8 +93,8 @@ public class JobRunrDeadlineManager extends AbstractDeadlineManager implements L
      * <p>
      * The {@link SpanFactory} is defaulted to a {@link NoOpSpanFactory}.
      * <p>
-     * The {@link JobScheduler}, {@link ScopeAwareProvider} and {@link Serializer} are <b>hard requirements</b> and as
-     * such should be provided.
+     * The {@link JobRequestScheduler}, {@link ScopeAwareProvider} and {@link Serializer} are <b>hard requirements</b>
+     * and as such should be provided.
      *
      * @return a Builder to be able to create a {@link JobRunrDeadlineManager}
      */
@@ -105,7 +106,7 @@ public class JobRunrDeadlineManager extends AbstractDeadlineManager implements L
      * Instantiate a {@link JobRunrDeadlineManager} based on the fields contained in the
      * {@link JobRunrDeadlineManager.Builder}.
      * <p>
-     * Will assert that the {@link ScopeAwareProvider}, {@link JobScheduler} and {@link Serializer} are not
+     * Will assert that the {@link ScopeAwareProvider}, {@link JobRequestScheduler} and {@link Serializer} are not
      * {@code null}, and will throw an {@link AxonConfigurationException} if any of them is {@code null}.
      *
      * @param builder the {@link QuartzDeadlineManager.Builder} used to instantiate a {@link QuartzDeadlineManager}
@@ -114,7 +115,7 @@ public class JobRunrDeadlineManager extends AbstractDeadlineManager implements L
     protected JobRunrDeadlineManager(Builder builder) {
         builder.validate();
         this.scopeAwareProvider = builder.scopeAwareProvider;
-        this.jobScheduler = builder.jobScheduler;
+        this.jobRequestScheduler = builder.jobRequestScheduler;
         this.serializer = builder.serializer;
         this.transactionManager = builder.transactionManager;
         this.spanFactory = builder.spanFactory;
@@ -149,10 +150,10 @@ public class JobRunrDeadlineManager extends AbstractDeadlineManager implements L
                                        .withId(deadlineId)
                                        .withName(deadlineName)
                                        .withLabels(getLabel(deadlineName), combinedLabel)
-                                       .withDetails(() -> this.execute(serializedDeadlineDetails,
-                                                                       deadlineId.toString()))
+                                       .withJobRequest(new DeadlineJobRequest(serializedDeadlineDetails,
+                                                                              deadlineId.toString()))
                                        .scheduleAt(triggerDateTime);
-            JobId id = jobScheduler.create(job);
+            JobId id = jobRequestScheduler.create(job);
             logger.debug("Job with id: [{}] was successfully created.", id);
         }));
         return deadlineId.toString();
@@ -163,7 +164,7 @@ public class JobRunrDeadlineManager extends AbstractDeadlineManager implements L
         Span span = spanFactory.createCancelScheduleSpan(deadlineName, scheduleId);
         runOnPrepareCommitOrNow(span.wrapRunnable(() -> {
             try {
-                jobScheduler.delete(toUuid(scheduleId), DELETE_REASON);
+                jobRequestScheduler.delete(toUuid(scheduleId), DELETE_REASON);
             } catch (IllegalJobStateChangeException e) {
                 if (!tryingToDeleteAlreadyDeletedJob(e.getFrom(), e.getTo())) {
                     throw e;
@@ -276,7 +277,7 @@ public class JobRunrDeadlineManager extends AbstractDeadlineManager implements L
 
     @Override
     public void shutdown() {
-        jobScheduler.shutdown();
+        jobRequestScheduler.shutdown();
     }
 
     @Override
@@ -291,12 +292,12 @@ public class JobRunrDeadlineManager extends AbstractDeadlineManager implements L
      * {@link DeadlineManagerSpanFactory} defaults to {@link DefaultDeadlineManagerSpanFactory} backed by a
      * {@link NoOpSpanFactory}.
      * <p>
-     * The {@link JobScheduler}, {@link ScopeAwareProvider} and {@link Serializer} are <b>hard requirements</b> and as
-     * such should be provided.
+     * The {@link JobRequestScheduler}, {@link ScopeAwareProvider} and {@link Serializer} are <b>hard
+     * requirements</b> and as such should be provided.
      */
     public static class Builder {
 
-        private JobScheduler jobScheduler;
+        private JobRequestScheduler jobRequestScheduler;
         private ScopeAwareProvider scopeAwareProvider;
         private Serializer serializer;
         private TransactionManager transactionManager = NoTransactionManager.INSTANCE;
@@ -305,14 +306,15 @@ public class JobRunrDeadlineManager extends AbstractDeadlineManager implements L
                                                                                           .build();
 
         /**
-         * Sets the {@link JobScheduler} used for scheduling and triggering purposes of the deadlines.
+         * Sets the {@link JobRequestScheduler} used for scheduling and triggering purposes of the deadlines.
          *
-         * @param jobScheduler a {@link JobScheduler} used for scheduling and triggering purposes of the deadlines
+         * @param jobRequestScheduler a {@link JobRequestScheduler} used for scheduling and triggering purposes of
+         *                            the deadlines
          * @return the current Builder instance, for fluent interfacing
          */
-        public Builder jobScheduler(JobScheduler jobScheduler) {
-            assertNonNull(jobScheduler, "JobScheduler may not be null");
-            this.jobScheduler = jobScheduler;
+        public Builder jobRequestScheduler(JobRequestScheduler jobRequestScheduler) {
+            assertNonNull(jobRequestScheduler, "JobRequestScheduler may not be null");
+            this.jobRequestScheduler = jobRequestScheduler;
             return this;
         }
 
@@ -407,7 +409,7 @@ public class JobRunrDeadlineManager extends AbstractDeadlineManager implements L
          */
         protected void validate() throws AxonConfigurationException {
             assertNonNull(scopeAwareProvider, "The ScopeAwareProvider is a hard requirement and should be provided.");
-            assertNonNull(jobScheduler, "The JobScheduler is a hard requirement and should be provided.");
+            assertNonNull(jobRequestScheduler, "The JobRequestScheduler is a hard requirement and should be provided.");
             assertNonNull(serializer, "The Serializer is a hard requirement and should be provided.");
         }
     }

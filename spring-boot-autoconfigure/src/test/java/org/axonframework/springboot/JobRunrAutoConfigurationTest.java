@@ -20,6 +20,7 @@ import org.axonframework.deadline.DeadlineManager;
 import org.axonframework.deadline.jobrunr.JobRunrDeadlineManager;
 import org.axonframework.eventhandling.scheduling.EventScheduler;
 import org.axonframework.eventhandling.scheduling.jobrunr.JobRunrEventScheduler;
+import org.jobrunr.scheduling.JobRequestScheduler;
 import org.jobrunr.scheduling.JobScheduler;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -56,6 +57,11 @@ class JobRunrAutoConfigurationTest {
         @Bean
         public JobScheduler jobScheduler(){
             return mock(JobScheduler.class);
+        }
+
+        @Bean
+        public JobRequestScheduler jobRequestScheduler(){
+            return mock(JobRequestScheduler.class);
         }
     }
 }

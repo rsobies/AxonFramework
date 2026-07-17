@@ -19,7 +19,7 @@
 
     <groupId>org.axonframework</groupId>
     <artifactId>axon</artifactId>
-    <version>4.13.1-vt2</version>
+    <version>4.13.1-vt3</version>
     <modules>
         <module>axon-server-connector</module>
         <module>disruptor</module>
@@ -36,7 +36,7 @@
         <module>spring</module>
         <module>spring-boot-autoconfigure</module>
         <module>spring-boot-starter</module>
-<!--        <module>test</module>-->
+        <module>test</module>
         <module>tracing-opentelemetry</module>
         <module>spring-boot3-dummy</module>
 <!--        <module>hibernate-6-integrationtests</module>-->
@@ -129,7 +129,7 @@
         <xstream.version>1.4.21</xstream.version>
         <!-- Scheduling -->
         <db-scheduler.version>16.6.0</db-scheduler.version>
-        <jobrunr.version>8.0.1</jobrunr.version>
+        <jobrunr.version>8.7.1</jobrunr.version>
         <quartz.version>2.4.0</quartz.version>
         <!-- Spring -->
         <spring.version>5.3.39</spring.version>

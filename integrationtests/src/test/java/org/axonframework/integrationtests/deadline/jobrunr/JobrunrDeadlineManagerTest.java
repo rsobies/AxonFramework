@@ -21,6 +21,7 @@ import org.axonframework.config.Configuration;
 import org.axonframework.config.ConfigurationScopeAwareProvider;
 import org.axonframework.deadline.DeadlineManager;
 import org.axonframework.deadline.DeadlineManagerSpanFactory;
+import org.axonframework.deadline.jobrunr.DeadlineJobRequestHandler;
 import org.axonframework.deadline.jobrunr.JobRunrDeadlineManager;
 import org.axonframework.integrationtests.deadline.AbstractDeadlineManagerTestSuite;
 import org.axonframework.messaging.ScopeAwareProvider;
@@ -28,7 +29,7 @@ import org.axonframework.messaging.ScopeDescriptor;
 import org.axonframework.modelling.command.AggregateScopeDescriptor;
 import org.axonframework.serialization.TestSerializer;
 import org.jobrunr.configuration.JobRunr;
-import org.jobrunr.scheduling.JobScheduler;
+import org.jobrunr.scheduling.JobRequestScheduler;
 import org.jobrunr.server.BackgroundJobServer;
 import org.jobrunr.storage.InMemoryStorageProvider;
 import org.jobrunr.storage.StorageProvider;
@@ -60,17 +61,17 @@ class JobrunrDeadlineManagerTest extends AbstractDeadlineManagerTestSuite {
     @Override
     public DeadlineManager buildDeadlineManager(Configuration configuration) {
         StorageProvider storageProvider = new InMemoryStorageProvider();
-        JobScheduler scheduler = new JobScheduler(storageProvider);
+        JobRequestScheduler scheduler = new JobRequestScheduler(storageProvider);
         JobRunrDeadlineManager manager = JobRunrDeadlineManager
                 .builder()
-                .jobScheduler(scheduler)
+                .jobRequestScheduler(scheduler)
                 .scopeAwareProvider(new ConfigurationScopeAwareProvider(configuration))
                 .serializer(TestSerializer.JACKSON.getSerializer())
                 .transactionManager(NoTransactionManager.INSTANCE)
                 .spanFactory(configuration.getComponent(DeadlineManagerSpanFactory.class))
                 .build();
         JobRunr.configure()
-               .useJobActivator(new SimpleActivator(spy(manager)))
+               .useJobActivator(new SimpleActivator(new DeadlineJobRequestHandler(spy(manager))))
                .useStorageProvider(storageProvider)
                .useBackgroundJobServer(
                        usingStandardBackgroundJobServerConfiguration().andPollInterval(Duration.ofMillis(200))
@@ -82,9 +83,9 @@ class JobrunrDeadlineManagerTest extends AbstractDeadlineManagerTestSuite {
 
     @Test
     void shutdownInvokesSchedulerShutdown(@Mock ScopeAwareProvider scopeAwareProvider) {
-        JobScheduler scheduler = spy(new JobScheduler(new InMemoryStorageProvider()));
+        JobRequestScheduler scheduler = spy(new JobRequestScheduler(new InMemoryStorageProvider()));
         JobRunrDeadlineManager testSubject = JobRunrDeadlineManager.builder()
-                                                                   .jobScheduler(scheduler)
+                                                                   .jobRequestScheduler(scheduler)
                                                                    .scopeAwareProvider(scopeAwareProvider)
                                                                    .serializer(TestSerializer.JACKSON.getSerializer())
                                                                    .transactionManager(NoTransactionManager.INSTANCE)

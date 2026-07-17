@@ -22,7 +22,7 @@ import org.axonframework.deadline.TestScopeDescriptor;
 import org.axonframework.messaging.ScopeAwareProvider;
 import org.axonframework.messaging.ScopeDescriptor;
 import org.axonframework.serialization.TestSerializer;
-import org.jobrunr.scheduling.JobScheduler;
+import org.jobrunr.scheduling.JobRequestScheduler;
 import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,7 +32,7 @@ class JobRunrDeadlineManagerBuilderTest {
 
     private static final String TEST_DEADLINE_NAME = "deadline-name";
     private JobRunrDeadlineManager.Builder builder;
-    private final JobScheduler jobScheduler = mock(JobScheduler.class);
+    private final JobRequestScheduler jobRequestScheduler = mock(JobRequestScheduler.class);
     private final TransactionManager transactionManager = mock(TransactionManager.class);
     private final ScopeAwareProvider scopeAwareProvider = mock(ScopeAwareProvider.class);
 
@@ -45,7 +45,7 @@ class JobRunrDeadlineManagerBuilderTest {
     void whenAllPropertiesAreSetCreatesManager() {
         JobRunrDeadlineManager manager = builder.scopeAwareProvider(scopeAwareProvider)
                                                 .transactionManager(transactionManager)
-                                                .jobScheduler(jobScheduler)
+                                                .jobRequestScheduler(jobRequestScheduler)
                                                 .serializer(TestSerializer.JACKSON.getSerializer())
                                                 .build();
 
@@ -54,14 +54,14 @@ class JobRunrDeadlineManagerBuilderTest {
 
     @Test
     void validateNeedsAllPropertiesSet() {
-        builder.jobScheduler(jobScheduler)
+        builder.jobRequestScheduler(jobRequestScheduler)
                .transactionManager(transactionManager);
         assertThrows(AxonConfigurationException.class, () -> builder.build());
     }
 
     @Test
     void whenSettingSchedulerWithNullThrowError() {
-        assertThrows(AxonConfigurationException.class, () -> builder.jobScheduler(null));
+        assertThrows(AxonConfigurationException.class, () -> builder.jobRequestScheduler(null));
     }
 
     @Test
@@ -78,7 +78,7 @@ class JobRunrDeadlineManagerBuilderTest {
     void cancelAllNotImplemented() {
         JobRunrDeadlineManager manager = builder.scopeAwareProvider(scopeAwareProvider)
                                                 .transactionManager(transactionManager)
-                                                .jobScheduler(jobScheduler)
+                                                .jobRequestScheduler(jobRequestScheduler)
                                                 .serializer(TestSerializer.JACKSON.getSerializer())
                                                 .build();
         assertThrows(UnsupportedOperationException.class,
@@ -89,7 +89,7 @@ class JobRunrDeadlineManagerBuilderTest {
     void cancelAllWithinScopeNotImplemented() {
         JobRunrDeadlineManager manager = builder.scopeAwareProvider(scopeAwareProvider)
                                                 .transactionManager(transactionManager)
-                                                .jobScheduler(jobScheduler)
+                                                .jobRequestScheduler(jobRequestScheduler)
                                                 .serializer(TestSerializer.JACKSON.getSerializer())
                                                 .build();
         ScopeDescriptor descriptor = new TestScopeDescriptor("aggregate-type", "aggregate-identifier");

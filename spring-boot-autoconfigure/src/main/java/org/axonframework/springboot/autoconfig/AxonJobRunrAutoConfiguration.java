@@ -21,13 +21,14 @@ import org.axonframework.config.Configuration;
 import org.axonframework.config.ConfigurationScopeAwareProvider;
 import org.axonframework.deadline.DeadlineManager;
 import org.axonframework.deadline.DeadlineManagerSpanFactory;
+import org.axonframework.deadline.jobrunr.DeadlineJobRequestHandler;
 import org.axonframework.deadline.jobrunr.JobRunrDeadlineManager;
 import org.axonframework.eventhandling.EventBus;
 import org.axonframework.eventhandling.scheduling.EventScheduler;
 import org.axonframework.eventhandling.scheduling.jobrunr.JobRunrEventScheduler;
 import org.axonframework.messaging.ScopeAwareProvider;
 import org.axonframework.serialization.Serializer;
-import org.axonframework.tracing.SpanFactory;
+import org.jobrunr.scheduling.JobRequestScheduler;
 import org.jobrunr.scheduling.JobScheduler;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -66,15 +67,15 @@ public class AxonJobRunrAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public DeadlineManager deadlineManager(
-            JobScheduler jobScheduler,
+            JobRequestScheduler jobRequestScheduler,
             Configuration configuration,
             @Qualifier("eventSerializer") Serializer serializer,
             TransactionManager transactionManager,
             DeadlineManagerSpanFactory spanFactory) {
         ScopeAwareProvider scopeAwareProvider = new ConfigurationScopeAwareProvider(configuration);
         return JobRunrDeadlineManager.builder()
-                                     .jobScheduler(jobScheduler)
-                                     .scopeAwareProvider(scopeAwareProvider)
+                                     .jobRequestScheduler(jobRequestScheduler)
+                .scopeAwareProvider(scopeAwareProvider)
                                      .serializer(serializer)
                                      .transactionManager(transactionManager)
                                      .spanFactory(spanFactory)
