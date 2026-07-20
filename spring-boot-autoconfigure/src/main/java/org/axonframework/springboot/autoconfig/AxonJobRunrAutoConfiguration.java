@@ -81,4 +81,10 @@ public class AxonJobRunrAutoConfiguration {
                                      .spanFactory(spanFactory)
                                      .build();
     }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public DeadlineJobRequestHandler deadlineJobRequestHandler(JobRunrDeadlineManager deadlineManager) {
+        return new DeadlineJobRequestHandler(deadlineManager);
+    }
 }

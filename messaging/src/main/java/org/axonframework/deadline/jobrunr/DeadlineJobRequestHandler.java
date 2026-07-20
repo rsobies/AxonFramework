@@ -26,8 +26,7 @@ import javax.annotation.Nonnull;
  * container (e.g. {@code JobActivator}), so it must be registered as a bean wherever a
  * {@link JobRunrDeadlineManager} is configured.
  *
- * @author Tom de Backer
- * @author Gerard Klijs
+ * @author rsobies
  * @since 4.13.1
  */
 public class DeadlineJobRequestHandler implements JobRequestHandler<DeadlineJobRequest> {
