@@ -29,8 +29,7 @@ import javax.annotation.Nonnull;
  * class. This makes it safe to use under GraalVM native image, where lambda classes don't retain the
  * metadata JobRunr's default {@code JobDetailsGenerator} needs.
  *
- * @author Tom de Backer
- * @author Gerard Klijs
+ * @author rsobies
  * @since 4.13.1
  */
 public class DeadlineJobRequest implements JobRequest {
